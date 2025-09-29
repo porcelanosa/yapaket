@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouPrint</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        @layer theme {
+            :root {
+                --spacing: 0.25rem;
+            }
+        }
+    </style>
+</head>
+<body class="font-sans text-gray-800">
+<header class="bg-white shadow-md p-4 flex justify-between items-center sticky top-0 z-10">
+    <div class="flex items-center">
+        <img src="https://picsum.photos/400/300" alt="YouPrint Logo" class="h-12">
+        <span class="text-xl font-bold text-red-600 ml-2">YouPrint</span>
+        <span class="text-sm text-gray-500 ml-1">сувениры полиграфия</span>
+    </div>
+    <div class="flex items-center space-x-4">
+        <input type="text" placeholder="Искать на сайте" class="border rounded p-2 focus:outline-none focus:ring-2 focus:ring-red-500 hover:border-red-300">
+        <button class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors duration-200">Задать вопрос</button>
+        <a href="tel:+79268426636" class="text-gray-600 hover:text-red-600">+7 926 842 66 36</a>
+        <button class="md:hidden relative group" id="menu-toggle">
+            <div class="relative flex overflow-hidden items-center justify-center rounded-full w-[50px] h-[50px] transform transition-all bg-slate-700 ring-0 ring-gray-300 hover:ring-8 group-focus:ring-4 ring-opacity-30 duration-200 shadow-md">
+                <div class="flex flex-col justify-between w-[20px] h-[20px] transform transition-all duration-300 origin-center overflow-hidden">
+                    <div class="bg-white h-[2px] w-7 transform transition-all duration-300 origin-left group-focus:translate-y-6 delay-100"></div>
+                    <div class="bg-white h-[2px] w-7 rounded transform transition-all duration-300 group-focus:translate-y-6 delay-75"></div>
+                    <div class="bg-white h-[2px] w-7 transform transition-all duration-300 origin-left group-focus:translate-y-6"></div>
+                    <div class="absolute items-center justify-between transform transition-all duration-500 top-2.5 -translate-x-10 group-focus:translate-x-0 flex w-0 group-focus:w-12">
+                        <div class="absolute bg-white h-[2px] w-5 transform transition-all duration-500 rotate-0 delay-300 group-focus:rotate-45"></div>
+                        <div class="absolute bg-white h-[2px] w-5 transform transition-all duration-500 -rotate-0 delay-300 group-focus:-rotate-45"></div>
+                    </div>
+                </div>
+            </div>
+        </button>
+    </div>
+</header>
+
+<nav class="bg-gray-100 p-4 hidden md:block">
+    <ul class="flex space-x-4">
+        <li><a href="#" class="text-red-600 hover:text-red-800">Печать</a></li>
+        <li><a href="#" class="text-red-600 hover:text-red-800">Присваивание</a></li>
+        <li><a href="#" class="text-red-600 hover:text-red-800">Сувениры</a></li>
+        <li><a href="#" class="text-red-600 hover:text-red-800">Ленточки</a></li>
+        <li><a href="#" class="text-red-600 hover:text-red-800">Спички</a></li>
+        <li><a href="#" class="text-red-600 hover:text-red-800">Воздушные шары</a></li>
+        <li><a href="#" class="text-red-600 hover:text-red-800">Ручки</a></li>
+        <li><a href="#" class="text-red-600 hover:text-red-800">Мешочки подарочные</a></li>
+        <li><a href="#" class="text-red-600 hover:text-red-800">Новогодние подарки</a></li>
+    </ul>
+</nav>
+
+<nav class="bg-gray-100 p-4 md:hidden" id="mobile-menu">
+    <ul class="space-y-2">
+        <li><a href="#" class="text-red-600 hover:text-red-800 block">Печать</a></li>
+        <li><a href="#" class="text-red-600 hover:text-red-800 block">Присваивание</a></li>
+        <li><a href="#" class="text-red-600 hover:text-red-800 block">Сувениры</a></li>
+        <li><a href="#" class="text-red-600 hover:text-red-800 block">Ленточки</a></li>
+        <li><a href="#" class="text-red-600 hover:text-red-800 block">Спички</a></li>
+        <li><a href="#" class="text-red-600 hover:text-red-800 block">Воздушные шары</a></li>
+        <li><a href="#" class="text-red-600 hover:text-red-800 block">Ручки</a></li>
+        <li><a href="#" class="text-red-600 hover:text-red-800 block">Мешочки подарочные</a></li>
+        <li><a href="#" class="text-red-600 hover:text-red-800 block">Новогодние подарки</a></li>
+    </ul>
+</nav>
+
+<main class="container mx-auto p-4">
+    <section class="mb-8">
+        <h2 class="text-2xl font-bold text-red-600 mb-4">Печать</h2>
+        <img src="https://picsum.photos/400/300" alt="Printing" class="mb-4">
+        <p class="text-gray-700">Печать календарей, брошюр, каталогов, книг, наклеек, плакатов. Производство любой рекламной полиграфии. Любые посередничные обработки тиражей. Обратное и цифровое тиражирование.</p>
+    </section>
+
+    <section class="mb-8">
+        <h2 class="text-2xl font-bold text-red-600 mb-4">Производство</h2>
+        <img src="https://picsum.photos/400/300" alt="Production" class="mb-4">
+        <p class="text-gray-700">Широкоформатная печать баннеров и флагов. Высечки, тавблички, стеллы, пластиковые карты. Диски, конверты, бобины.</p>
+    </section>
+
+    <section class="mb-8">
+        <h2 class="text-2xl font-bold text-red-600 mb-4">Сувениры</h2>
+        <img src="https://picsum.photos/400/300" alt="Souvenirs" class="mb-4">
+        <p class="text-gray-700">Сувениры с нанесением логотипа компании. Брендирование любой продукции и подарков. Печать фирменного логотипа по любым поверхностям.</p>
+    </section>
+
+    <section class="mb-8">
+        <h2 class="text-2xl font-bold text-red-600 mb-4">Новости мира полиграфии</h2>
+        <p class="text-gray-700">Креативный календарь. Необычный календарь напечатали для железнодорожной транспортной компании. ДIZAйн YouPrint.ru и скидка стандартные календари, всегда рады помочь и на долю стандартные календари, всегда рады помочь.</p>
+    </section>
+
+    <section class="mb-8">
+        <h2 class="text-2xl font-bold text-red-600 mb-4">Объемные наклейки</h2>
+        <p class="text-gray-700">Типография YouPrint.ru протестировало печать наклеек в смоле на металлизированных пленках. Теперь объемная наклейка со смолой может быть нанесена на телефон, ноутбук или любой другой предмет. Золотая объемная наклейка или серебряная наклейка в смоле с печатью Вашего изображения, только у нас!</p>
+    </section>
+
+    <section class="mb-8">
+        <h2 class="text-2xl font-bold text-red-600 mb-4">Самобранная коробка</h2>
+        <p class="text-gray-700">Типография YouPrint усовершенствовала процесс изготовления упаковки. Теперь коробка изготавливается на заказ, с печатью фото на коробке с коробок – не нужно много места для хранения упаковки, а при необходимости с легкостью сложить нужное количество самобранных коробок.</p>
+    </section>
+</main>
+
+<footer class="bg-gray-200 p-4">
+    <div class="container mx-auto grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+            <h3 class="text-lg font-bold text-red-600 mb-2">Контакты</h3>
+            <p>Оплата</p>
+            <p>Доставка</p>
+        </div>
+        <div>
+            <h3 class="text-lg font-bold text-red-600 mb-2">Оплата</h3>
+            <p>Электронная почта</p>
+            <p>24@yoprint.ru</p>
+            <p>Наш адрес</p>
+            <p>г. Москва, ул. Принципиальная д. 19А стр. 2</p>
+        </div>
+        <div>
+            <h3 class="text-lg font-bold text-red-600 mb-2">Доставка</h3>
+            <p>Примерные блоки</p>
+            <p>Разработка подарочной упаковки</p>
+            <p>Post-it с логотипом</p>
+            <p>Печать флагов на ткани</p>
+            <p>Изготовление вывески</p>
+            <p>Снижку с логотипом</p>
+            <p>Изготовление Z-Card</p>
+            <p>Креативные календари на 2025 г.</p>
+        </div>
+    </div>
+    <p class="text-center text-sm text-gray-500 mt-4">&copy; 2025 YouPrint</p>
+</footer>
+
+<script>
+    document.getElementById('menu-toggle').addEventListener('click', function() {
+        const menu = document.getElementById('mobile-menu');
+        menu.classList.toggle('hidden');
+    });
+</script>
+</body>
+</html>

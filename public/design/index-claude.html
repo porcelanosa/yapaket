@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouPrint - Сувениры и Полиграфия</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        @layer theme {
+            :root {
+                --spacing: 0.25rem;
+            }
+        }
+        html, body {
+            height: 100%;
+            margin: 0;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+            background-color: #f5f5f5;
+        }
+        .content {
+            flex: 1 0 auto;
+        }
+        .footer {
+            flex-shrink: 0;
+        }
+        .hamburger-line {
+            display: block;
+            height: 3px;
+            width: 25px;
+            background-color: #dc2626;
+            margin: 4px 0;
+            transition: 0.3s;
+        }
+        .hamburger-active .hamburger-line:nth-child(1) {
+            transform: rotate(-45deg) translate(-5px, 6px);
+        }
+        .hamburger-active .hamburger-line:nth-child(2) {
+            opacity: 0;
+        }
+        .hamburger-active .hamburger-line:nth-child(3) {
+            transform: rotate(45deg) translate(-5px, -6px);
+        }
+        .menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 40;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        .menu-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 80%;
+            max-width: 400px;
+            height: 100%;
+            background-color: #f5f5f5;
+            z-index: 50;
+            transition: right 0.3s ease;
+            overflow-y: auto;
+        }
+        .mobile-menu.active {
+            right: 0;
+        }
+    </style>
+</head>
+<body class="font-sans text-gray-800">
+<!-- Header -->
+<header class="bg-white shadow-sm sticky top-0 z-30">
+    <div class="container mx-auto px-4">
+        <!-- Top row with logo, search, and contact -->
+        <div class="flex items-center justify-between py-3">
+            <div class="flex items-center">
+                <div class="text-2xl font-bold">
+                    <span class="text-black">You</span><span class="bg-red-600 text-white px-1 rounded">Print</span>
+                </div>
+                <div class="hidden md:block ml-2 text-xs text-gray-500 uppercase tracking-wide">
+                    Сувениры Полиграфия
+                </div>
+            </div>
+
+            <!-- Search bar (desktop) -->
+            <div class="hidden md:flex flex-1 max-w-md mx-8">
+                <div class="relative w-full">
+                    <input type="text" placeholder="Искать на сайте"
+                           class="w-full border-2 border-dashed border-gray-400 rounded-none px-3 py-2 text-sm">
+                </div>
+            </div>
+
+            <!-- Contact info and mobile menu -->
+            <div class="flex items-center space-x-4">
+                <div class="hidden md:block text-right">
+                    <div class="text-lg font-bold">+7 926 842 66 36</div>
+                    <div class="text-sm text-gray-600 underline">24@youprint.ru</div>
+                </div>
+                <button class="bg-red-600 text-white px-4 py-2 text-sm font-medium">
+                    задать вопрос
+                </button>
+
+                <!-- Mobile menu button -->
+                <button id="menu-toggle" class="md:hidden p-2 focus:outline-none">
+                    <div class="hamburger-line"></div>
+                    <div class="hamburger-line"></div>
+                    <div class="hamburger-line"></div>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile search -->
+        <div class="md:hidden pb-3">
+            <input type="text" placeholder="Искать на сайте"
+                   class="w-full border-2 border-dashed border-gray-400 rounded-none px-3 py-2 text-sm">
+        </div>
+    </div>
+</header>
+
+<!-- Mobile menu overlay -->
+<div id="menu-overlay" class="menu-overlay"></div>
+
+<!-- Mobile menu -->
+<div id="mobile-menu" class="mobile-menu">
+    <div class="p-4">
+        <!-- Close button -->
+        <div class="flex justify-end mb-4">
+            <button id="menu-close" class="text-red-600 text-2xl font-bold">✕</button>
+        </div>
+
+        <!-- Mobile contact info -->
+        <div class="mb-6">
+            <div class="text-lg font-bold mb-1">+7 926 842 66 36</div>
+            <div class="text-sm text-blue-600 underline mb-4">24@youprint.ru</div>
+
+            <div class="mb-4">
+                <div class="font-semibold underline mb-2">Контакты</div>
+                <div class="font-semibold underline mb-2">Оплата</div>
+                <div class="font-semibold underline">Доставка</div>
+            </div>
+
+            <!-- Social icons -->
+            <div class="flex space-x-2">
+                <div class="w-8 h-8 bg-pink-500 rounded"></div>
+                <div class="w-8 h-8 bg-blue-600 rounded"></div>
+                <div class="w-8 h-8 bg-blue-800 rounded"></div>
+            </div>
+        </div>
+
+        <!-- Mobile menu categories -->
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <h3 class="font-bold text-red-600 border-b border-red-600 pb-1 mb-3">Печать</h3>
+                <ul class="space-y-2 text-sm">
+                    <li><a href="#" class="text-gray-700 underline">Календари</a></li>
+                    <li><a href="#" class="text-gray-700 underline">Брошюры</a></li>
+                    <li><a href="#" class="text-gray-700 underline">Папки</a></li>
+                    <li><a href="#" class="text-gray-700 underline">Визитки</a></li>
+                    <li><a href="#" class="text-gray-700 underline">Пакеты</a></li>
+                    <li><a href="#" class="text-gray-700 underline">Блокноты</a></li>
+                    <li><a href="#" class="text-gray-700 underline">Упаковка</a></li>
+                    <li><a href="#" class="text-gray-700 underline">Буклеты</a></li>
+                    <li><a href="#" class="text-gray-700 underline">Наклейки</a></li>
+                    <li><a href="#" class="text-gray-700 underline">Листовки</a></li>
+                    <li><a href="#" class="text-gray-700 underline">Конверты</a></li>
+                    <li><a href="#" class="text-gray-700 underline">Кубарики</a></li>
+                    <li><a href="#" class="text-gray-700 underline">Пригласительные</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h3 class="font-bold text-red-600 border-b border-red-600 pb-1 mb-3">Сувениры</h3>
+                <ul class="space-y-2 text-sm">
+                    <li><a href="#" class="text-gray-700 underline">Ленточки</a></li>
+                    <li><a href="#" class="text-gray-700 underline">Спички</a></li>
+                    <li><a href="#" class="text-gray-700 underline">Воздушные шары</a></li>
+                    <li><a href="#" class="text-gray-700 underline">Ручки</a></li>
+                    <li><a href="#" class="text-gray-700 underline">Мешочки подарочные</a></li>
+                    <li><a href="#" class="text-gray-700 underline">Новогодние подарки</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="mt-6">
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <h3 class="font-bold text-red-600 border-b border-red-600 pb-1 mb-3">Производство</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="text-gray-700 underline">Баннеры</a></li>
+                        <li><a href="#" class="text-gray-700 underline">Флаги</a></li>
+                        <li><a href="#" class="text-gray-700 underline">Вывески</a></li>
+                        <li><a href="#" class="text-gray-700 underline">Таблички</a></li>
+                        <li><a href="#" class="text-gray-700 underline">Стенды</a></li>
+                        <li><a href="#" class="text-gray-700 underline">Пластиковые карты</a></li>
+                        <li><a href="#" class="text-gray-700 underline">Диспенсеры</a></li>
+                        <li><a href="#" class="text-gray-700 underline">Хенгеры</a></li>
+                        <li><a href="#" class="text-gray-700 underline">Воблеры</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main content -->
+<div class="content">
+    <!-- Desktop layout -->
+    <div class="hidden md:block container mx-auto p-4">
+        <div class="grid grid-cols-1 lg:grid-cols-[240px_1fr_300px] gap-6">
+            <!-- Left sidebar -->
+            <aside class="bg-white rounded-lg">
+                <!-- Печать section -->
+                <div class="mb-6">
+                    <h2 class="font-bold text-red-600 border-b border-red-600 pb-2 mb-4">Печать</h2>
+                    <ul class="space-y-1 text-sm">
+                        <li><a href="#" class="text-gray-700 hover:text-red-600">Календари</a></li>
+                        <li><a href="#" class="text-gray-700 hover:text-red-600">Брошюры</a></li>
+                        <li><a href="#" class="text-gray-700 hover:text-red-600">Папки</a></li>
+                        <li><a href="#" class="text-gray-700 hover:text-red-600">Визитки</a></li>
+                        <li><a href="#" class="text-gray-700 hover:text-red-600">Пакеты</a></li>
+                        <li><a href="#" class="text-gray-700 hover:text-red-600">Блокноты</a></li>
+                        <li><a href="#" class="text-gray-700 hover:text-red-600">Упаковка</a></li>
+                        <li><a href="#" class="text-gray-700 hover:text-red-600">Буклеты</a></li>
+                        <li><a href="#" class="text-gray-700 hover:text-red-600">Наклейки</a></li>
+                        <li><a href="#" class="text-gray-700 hover:text-red-600">Листовки</a></li>
+                        <li><a href="#" class="text-gray-700 hover:text-red-600">Конверты</a></li>
+                        <li><a href="#" class="text-gray-700 hover:text-red-600">Кубарики</a></li>
+                        <li><a href="#" class="text-gray-700 hover:text-red-600">Пригласительные</a></li>
+                    </ul>
+                </div>
+
+                <!-- Производство section -->
+                <div class="mb-6">
+                    <h2 class="font-bold text-red-600 border-b border-red-600 pb-2 mb-4">Производство</h2>
+                    <ul class="space-y-1 text-sm">
+                        <li><a href="#" class="text-gray-700 hover:text-red-600">Баннеры</a></li>
+                        <li><a href="#" class="text-gray-700 hover:text-red-600">Флаги</a></li>
+                        <li><a href="#" class="text-gray-700 hover:text-red-600">Вывески</a></li>
+                        <li><a href="#" class="text-gray-700 hover:text-red-600">Таблички</a></li>
+                        <li><a href="#" class="text-gray-700 hover:text-red-600">Стенды</a></li>
+                        <li><a href="#" class="text-gray-700 hover:text-red-600">Пластиковые карты</a></li>
+                        <li><a href="#" class="text-gray-700 hover:text-red-600">Диспенсеры</a></li>
+                        <li><a href="#" class="text-gray-700 hover:text-red-600">Хенгеры</a></li>
+                        <li><a href="#" class="text-gray-700 hover:text-red-600">Воблеры</a></li>
+                    </ul>
+                </div>
+
+                <!-- Сувениры section -->
+                <div>
+                    <h2 class="font-bold text-red-600 border-b border-red-600 pb-2 mb-4">Сувениры</h2>
+                    <ul class="space-y-1 text-sm">
+                        <li><a href="#" class="text-gray-700 hover:text-red-600">Ленточки</a></li>
+                        <li><a href="#" class="text-gray-700 hover:text-red-600">Спички</a></li>
+                        <li><a href="#" class="text-gray-700 hover:text-red-600">Воздушные шары</a></li>
+                        <li><a href="#" class="text-gray-700 hover:text-red-600">Ручки</a></li>
+                        <li><a href="#" class="text-gray-700 hover:text-red-600">Мешочки подарочные</a></li>
+                        <li><a href="#" class="text-gray-700 hover:text-red-600">Новогодние подарки</a></li>
+                    </ul>
+                </div>
+            </aside>
+
+            <!-- Main content area -->
+            <main class="space-y-8">
+                <!-- Печать section -->
+                <section class="bg-white rounded-lg p-6">
+                    <div class="flex flex-col md:flex-row gap-6">
+                        <div class="md:w-1/2">
+                            <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjI1MCIgdmlld0JveD0iMCAwIDQwMCAyNTAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMjUwIiBmaWxsPSIjRjNGNEY2Ii8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTI1IiBmaWxsPSIjNjc3Mjg5IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+UHJpbnRpbmcgU2VydmljZXM8L3RleHQ+Cjwvc3ZnPg=="
+                                 alt="Printing equipment" class="w-full h-auto rounded">
+                        </div>
+                        <div class="md:w-1/2">
+                            <h2 class="text-2xl font-bold text-red-600 mb-4">Печать</h2>
+                            <p class="text-gray-600 leading-relaxed">
+                                Печать календарей, брошюр, каталогов, книг, наклеек, плакатов.
+                                Производство любой рекламной полиграфии. Любые послепечатные
+                                обработки тиражей. Офсетное и цифровое тиражирование.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Производство section -->
+                <section class="bg-white rounded-lg p-6">
+                    <div class="flex flex-col md:flex-row gap-6">
+                        <div class="md:w-1/2">
+                            <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjI1MCIgdmlld0JveD0iMCAwIDQwMCAyNTAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMjUwIiBmaWxsPSIjRjNGNEY2Ii8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTI1IiBmaWxsPSIjNjc3Mjg5IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+UHJvZHVjdGlvbjwvdGV4dD4KPHN2Zz4="
+                                 alt="Production services" class="w-full h-auto rounded">
+                        </div>
+                        <div class="md:w-1/2">
+                            <h2 class="text-2xl font-bold text-red-600 mb-4">Производство</h2>
+                            <p class="text-gray-600 leading-relaxed">
+                                Широкоформатная печать баннеров и флагов. Производство вывесок
+                                и табличек. Изготовление различных POS материалов для точек
+                                продаж или выставок.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Сувениры section -->
+                <section class="bg-white rounded-lg p-6">
+                    <div class="flex flex-col md:flex-row gap-6">
+                        <div class="md:w-1/2">
+                            <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjI1MCIgdmlld0JveD0iMCAwIDQwMCAyNTAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMjUwIiBmaWxsPSIjRjNGNEY2Ii8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTI1IiBmaWxsPSIjNjc3Mjg5IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+U291dmVuaXJzPC90ZXh0Pgo8L3N2Zz4="
+                                 alt="Souvenirs" class="w-full h-auto rounded">
+                        </div>
+                        <div class="md:w-1/2">
+                            <h2 class="text-2xl font-bold text-red-600 mb-4">Сувениры</h2>
+                            <p class="text-gray-600 leading-relaxed">
+                                Сувениры с нанесением логотипа компании. Брендирование любой продукции и подарков.
+                                Печать фирменного логотипа по любым поверхностям.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- News section -->
+                <section class="bg-white rounded-lg p-6">
+                    <h2 class="text-2xl font-bold text-red-600 border-b border-red-600 pb-2 mb-6">Новости мира полиграфии</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <h3 class="font-bold mb-2">Креативный календарь</h3>
+                            <p class="text-sm text-gray-600">
+                                Необычный календарь напечатали для железнодорожной транспортной компании. Дизайн
+                                креативного календаря и задумка принадлежит компании YouPrint.ru и если надоели стандартные календари всегда
+                                рады помочь их доработать, сделать более оригинальный календарь.
+                            </p>
+                        </div>
+                        <div>
+                            <h3 class="font-bold mb-2">Объёмные наклейки</h3>
+                            <p class="text-sm text-gray-600">
+                                Типография YouPrint.ru протестировала печать наклеек в смоле на металлизированных плёнках. Теперь объёмная
+                                наклейка со смолой может быть не только на белом фоне! Золотая объёмная наклейка или серебряная наклейка в
+                                смоле с печатью Вашего изображения, только у нас!
+                            </p>
+                        </div>
+                    </div>
+                </section>
+            </main>
+
+            <!-- Right sidebar -->
+            <aside class="bg-white rounded-lg p-4">
+                <h2 class="font-bold mb-4">Контакты</h2>
+                <div class="text-sm space-y-2 mb-4">
+                    <div class="font-semibold underline">Оплата</div>
+                    <div class="font-semibold underline">Доставка</div>
+                </div>
+
+                <div class="mb-4">
+                    <div class="text-sm font-semibold mb-2">Электронная почта</div>
+                    <div class="text-sm text-blue-600 underline">24@youprint.ru</div>
+                </div>
+
+                <div class="mb-4">
+                    <div class="text-sm font-semibold mb-2">Наш адрес</div>
+                    <div class="text-sm">
+                        г. Москва, ул.<br>
+                        Пряишникова д. 19А<br>
+                        стр. 2
+                    </div>
+                </div>
+
+                <div class="flex space-x-2 mb-6">
+                    <div class="w-8 h-8 bg-pink-500 rounded"></div>
+                    <div class="w-8 h-8 bg-blue-600 rounded"></div>
+                    <div class="w-8 h-8 bg-blue-800 rounded"></div>
+                </div>
+
+                <div>
+                    <h3 class="font-bold mb-3">Интересные предложения</h3>
+                    <ul class="text-sm space-y-2">
+                        <li><a href="#" class="text-gray-700 hover:text-red-600">Печать календарей на 2025 г. заказать</a></li>
+                        <li><a href="#" class="text-gray-700 hover:text-red-600">Печать баннеров с люверсами</a></li>
+                        <li><a href="#" class="text-gray-700 hover:text-red-600">Изготовление рекламных брошюр</a></li>
+                        <li><a href="#" class="text-gray-700 hover:text-red-600">Папки из дизайнерской бумаги</a></li>
+                        <li><a href="#" class="text-gray-700 hover:text-red-600">Пакеты с логотипом на заказ</a></li>
+                        <li><a href="#" class="text-gray-700 hover:text-red-600">Фирменные блокноты компании</a></li>
+                        <li><a href="#" class="text-gray-700 hover:text-red-600">Разработка подарочной упаковки</a></li>
+                        <li><a href="#" class="text-gray-700 hover:text-red-600">Post-it с логотипом</a></li>
+                        <li><a href="#" class="text-gray-700 hover:text-red-600">Печать флагов на ткани</a></li>
+                        <li><a href="#" class="text-gray-700 hover:text-red-600">Изготовление вывески</a></li>
+                        <li><a href="#" class="text-gray-700 hover:text-red-600">Ленты с логотипом</a></li>
+                        <li><a href="#" class="text-gray-700 hover:text-red-600">Спички с логотипом</a></li>
+                        <li><a href="#" class="text-gray-700 hover:text-red-600">Изготовление Z-Card</a></li>
+                        <li><a href="#" class="text-gray-700 hover:text-red-600">Креативные календари на 2025 г.</a></li>
+                    </ul>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <!-- Mobile layout -->
+    <div class="md:hidden">
+        <div class="space-y-6 p-4">
+            <!-- Печать section mobile -->
+            <section class="bg-white rounded-lg overflow-hidden">
+                <div class="p-4">
+                    <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjI1MCIgdmlld0JveD0iMCAwIDQwMCAyNTAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMjUwIiBmaWxsPSIjRjNGNEY2Ii8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTI1IiBmaWxsPSIjNjc3Mjg5IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+UHJpbnRpbmcgU2VydmljZXM8L3RleHQ+Cjwvc3ZnPg=="
+                         alt="Printing services" class="w-full h-auto rounded mb-4">
+
+                    <h2 class="text-xl font-bold text-red-600 mb-3">Печать</h2>
+                    <p class="text-gray-600 text-sm leading-relaxed">
+                        Печать календарей, брошюр, каталогов, книг, наклеек, плакатов.
+                        Производство любой рекламной полиграфии. Любые послепечатные
+                        обработки тиражей. Офсетное и цифровое тиражирование.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Производство section mobile -->
+            <section class="bg-white rounded-lg overflow-hidden">
+                <div class="p-4">
+                    <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjI1MCIgdmlld0JveD0iMCAwIDQwMCAyNTAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMjUwIiBmaWxsPSIjRjNGNEY2Ii8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTI1IiBmaWxsPSIjNjc3Mjg5IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+UHJvZHVjdGlvbjwvdGV4dD4KPHN2Zz4="
+                         alt="Production services" class="w-full h-auto rounded mb-4">
+
+                    <h2 class="text-xl font-bold text-red-600 mb-3">Производство</h2>
+                    <p class="text-gray-600 text-sm leading-relaxed">
+                        Широкоформатная печать баннеров и флагов. Производство вывесок
+                        и табличек. Изготовление различных POS материалов для точек
+                        продаж или выставок.
+                    </p>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+
+<script>
+    const menuToggle = document.getElementById('menu-toggle');
+    const menuClose = document.getElementById('menu-close');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const menuOverlay = document.getElementById('menu-overlay');
+
+    function openMenu() {
+        mobileMenu.classList.add('active');
+        menuOverlay.classList.add('active');
+        menuToggle.classList.add('hamburger-active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeMenu() {
+        mobileMenu.classList.remove('active');
+        menuOverlay.classList.remove('active');
+        menuToggle.classList.remove('hamburger-active');
+        document.body.style.overflow = '';
+    }
+
+    menuToggle.addEventListener('click', openMenu);
+    menuClose.addEventListener('click', closeMenu);
+    menuOverlay.addEventListener('click', closeMenu);
+
+    // Close menu on escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeMenu();
+        }
+    });
+</script>
+</body>
+</html>
