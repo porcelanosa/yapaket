@@ -63,6 +63,8 @@ jobs:
           tar -czf ../deploy.tar.gz \
             --exclude='.git' \
             --exclude='.github' \
+            --exclude='.junie' \
+            --exclude='.vscode' \
             --exclude='node_modules' \
             --exclude='.env' \
             --exclude='.env.example' \
