@@ -60,7 +60,7 @@ jobs:
       - name: 📦 Create deployment archive
         run: |
           echo "Creating deployment archive..."
-          tar -czf deploy.tar.gz \
+          tar -czf ../deploy.tar.gz \
             --exclude='.git' \
             --exclude='.github' \
             --exclude='node_modules' \
