@@ -1,0 +1,316 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    name: Deploy to yapaket.ru
+    runs-on: ubuntu-latest
+
+    steps:
+      # ============================================
+      # 1. CHECKOUT CODE
+      # ============================================
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      # ============================================
+      # 2. SETUP PHP 8.4
+      # ============================================
+      - name: 🐘 Setup PHP 8.4
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, xml, ctype, iconv, intl, pdo_mysql, dom, filter, gd, json, zip, pdo_mysql, zip, exif, pdo
+          tools: composer:v2
+
+      # ============================================
+      # 3. SETUP NODE.JS
+      # ============================================
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      # ============================================
+      # 4. INSTALL COMPOSER DEPENDENCIES
+      # ============================================
+      - name: 📚 Install Composer dependencies
+        run: composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
+
+      # ============================================
+      # 5. INSTALL NPM DEPENDENCIES
+      # ============================================
+      - name: 📦 Install NPM dependencies
+        run: npm ci
+
+      # ============================================
+      # 6. BUILD FRONTEND ASSETS
+      # ============================================
+      - name: 🔨 Build frontend assets
+        run: npm run build
+
+      # ============================================
+      # 7. CREATE DEPLOYMENT ARCHIVE
+      # ============================================
+      - name: 📦 Create deployment archive
+        run: |
+          echo "Creating deployment archive..."
+          tar -czf deploy.tar.gz \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='node_modules' \
+            --exclude='.env' \
+            --exclude='.env.example' \
+            --exclude='storage/logs/*' \
+            --exclude='storage/framework/cache/data/*' \
+            --exclude='storage/framework/sessions/*' \
+            --exclude='storage/framework/views/*' \
+            --exclude='tests' \
+            --exclude='.gitignore' \
+            --exclude='.gitattributes' \
+            --exclude='phpunit.xml' \
+            --exclude='README.md' \
+            --exclude='package.json' \
+            --exclude='package-lock.json' \
+            --exclude='vite.config.js' \
+            --exclude='tailwind.config.js' \
+            --exclude='postcss.config.js' \
+            .
+          echo "✅ Archive created successfully"
+
+      # ============================================
+      # 8. SETUP SSH
+      # ============================================
+      - name: 🔑 Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -p ${{ secrets.SSH_PORT }} -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+
+      # ============================================
+      # 9. UPLOAD TO SERVER
+      # ============================================
+      - name: 🚀 Upload files to server
+        run: |
+          echo "Uploading deployment archive..."
+          scp -P ${{ secrets.SSH_PORT }} -i ~/.ssh/deploy_key deploy.tar.gz ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:/tmp/yapaket-deploy.tar.gz
+          echo "✅ Upload completed"
+
+      # ============================================
+      # 10. DEPLOY ON SERVER
+      # ============================================
+      - name: 🎯 Deploy application on server
+        run: |
+          ssh -p ${{ secrets.SSH_PORT }} -i ~/.ssh/deploy_key ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} << 'ENDSSH'
+            set -e
+          
+            echo "================================================"
+            echo "🚀 Starting deployment to yapaket.ru"
+            echo "================================================"
+          
+            # Переменные
+            DEPLOY_PATH="${{ secrets.DEPLOY_PATH }}"
+            TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+            BACKUP_DIR="${DEPLOY_PATH}/backups"
+          
+            # Создаем директорию для бэкапов
+            mkdir -p ${BACKUP_DIR}
+          
+            # ============================================
+            # BACKUP CURRENT VERSION
+            # ============================================
+            echo ""
+            echo "📦 Creating backup of current version..."
+            if [ -f "${DEPLOY_PATH}/composer.json" ]; then
+              cd ${DEPLOY_PATH}
+              tar -czf ${BACKUP_DIR}/backup-${TIMESTAMP}.tar.gz \
+                --exclude='storage/logs/*' \
+                --exclude='storage/framework/cache/*' \
+                --exclude='storage/framework/sessions/*' \
+                --exclude='storage/framework/views/*' \
+                --exclude='vendor' \
+                --exclude='node_modules' \
+                . 2>/dev/null || echo "⚠️  Backup skipped (first deploy?)"
+              echo "✅ Backup created: backup-${TIMESTAMP}.tar.gz"
+          
+              # Удаляем старые бэкапы (оставляем последние 5)
+              cd ${BACKUP_DIR}
+              ls -t backup-*.tar.gz | tail -n +6 | xargs -r rm
+              echo "✅ Old backups cleaned"
+            else
+              echo "⚠️  No existing installation found, skipping backup"
+            fi
+          
+            # ============================================
+            # EXTRACT NEW VERSION
+            # ============================================
+            echo ""
+            echo "📂 Extracting new version..."
+            cd ${DEPLOY_PATH}
+          
+            # Сохраняем важные файлы
+            if [ -f ".env" ]; then
+              cp .env /tmp/.env.backup
+              echo "✅ .env backed up"
+            fi
+          
+            if [ -d "storage" ]; then
+              mkdir -p /tmp/storage-backup
+              cp -r storage/app /tmp/storage-backup/ 2>/dev/null || true
+              cp -r storage/logs /tmp/storage-backup/ 2>/dev/null || true
+              echo "✅ storage backed up"
+            fi
+          
+            # Распаковываем новую версию
+            tar -xzf /tmp/yapaket-deploy.tar.gz -C ${DEPLOY_PATH}
+            rm /tmp/yapaket-deploy.tar.gz
+            echo "✅ New version extracted"
+          
+            # Восстанавливаем важные файлы
+            if [ -f "/tmp/.env.backup" ]; then
+              mv /tmp/.env.backup ${DEPLOY_PATH}/.env
+              echo "✅ .env restored"
+            fi
+          
+            if [ -d "/tmp/storage-backup/app" ]; then
+              cp -r /tmp/storage-backup/app/* ${DEPLOY_PATH}/storage/app/ 2>/dev/null || true
+              echo "✅ storage/app restored"
+            fi
+          
+            if [ -d "/tmp/storage-backup/logs" ]; then
+              cp -r /tmp/storage-backup/logs/* ${DEPLOY_PATH}/storage/logs/ 2>/dev/null || true
+              echo "✅ storage/logs restored"
+            fi
+          
+            rm -rf /tmp/storage-backup
+          
+            # ============================================
+            # SET PERMISSIONS
+            # ============================================
+            echo ""
+            echo "🔒 Setting permissions..."
+            cd ${DEPLOY_PATH}
+          
+            # Создаем необходимые директории
+            mkdir -p storage/framework/cache/data
+            mkdir -p storage/framework/sessions
+            mkdir -p storage/framework/views
+            mkdir -p storage/logs
+            mkdir -p bootstrap/cache
+          
+            # Устанавливаем права
+            chmod -R 755 storage bootstrap/cache
+            chmod -R 775 storage/framework
+            chmod -R 775 storage/logs
+          
+            echo "✅ Permissions set"
+          
+            # ============================================
+            # RUN LARAVEL COMMANDS
+            # ============================================
+            echo ""
+            echo "⚙️  Running Laravel commands..."
+            cd ${DEPLOY_PATH}
+          
+            # Создаем символическую ссылку для storage (если не существует)
+            if [ ! -L "public/storage" ]; then
+              php artisan storage:link
+              echo "✅ Storage link created"
+            fi
+          
+            # Запускаем миграции
+            php artisan migrate --force
+            echo "✅ Migrations completed"
+          
+            # Очищаем старый кеш
+            php artisan cache:clear
+            php artisan config:clear
+            php artisan route:clear
+            php artisan view:clear
+            echo "✅ Cache cleared"
+          
+            # Создаем новый кеш
+            php artisan config:cache
+            php artisan route:cache
+            php artisan view:cache
+            echo "✅ Cache optimized"
+          
+            # Оптимизация autoloader
+            composer dump-autoload --optimize --no-dev
+            echo "✅ Autoloader optimized"
+          
+            # ============================================
+            # RELOAD PHP-FPM (если есть права)
+            # ============================================
+            echo ""
+            echo "🔄 Reloading PHP-FPM..."
+            if command -v systemctl &> /dev/null; then
+              if sudo -n systemctl reload php8.4-fpm 2>/dev/null; then
+                echo "✅ PHP-FPM reloaded"
+              else
+                echo "⚠️  PHP-FPM reload skipped (no sudo access)"
+              fi
+            else
+              echo "⚠️  systemctl not available, skipping PHP-FPM reload"
+            fi
+          
+            # ============================================
+            # CLEANUP
+            # ============================================
+            echo ""
+            echo "🧹 Cleaning up..."
+            cd ${DEPLOY_PATH}
+          
+            # Удаляем ненужные файлы
+            rm -f deploy.tar.gz
+            rm -rf tests
+            rm -f phpunit.xml
+          
+            echo "✅ Cleanup completed"
+          
+            echo ""
+            echo "================================================"
+            echo "✅ Deployment completed successfully!"
+            echo "================================================"
+            echo ""
+            echo "📊 Deployment info:"
+            echo "  - Timestamp: ${TIMESTAMP}"
+            echo "  - Deploy path: ${DEPLOY_PATH}"
+            echo "  - Backup: ${BACKUP_DIR}/backup-${TIMESTAMP}.tar.gz"
+            echo ""
+            echo "🌐 Website: https://yapaket.ru"
+            echo ""
+          ENDSSH
+
+      # ============================================
+      # 11. VERIFY DEPLOYMENT
+      # ============================================
+      - name: ✅ Verify deployment
+        run: |
+          echo "Checking website status..."
+          HTTP_CODE=$(curl -o /dev/null -s -w "%{http_code}\n" https://yapaket.ru)
+          if [ "$HTTP_CODE" == "200" ] || [ "$HTTP_CODE" == "301" ] || [ "$HTTP_CODE" == "302" ]; then
+            echo "✅ Website is accessible (HTTP $HTTP_CODE)"
+          else
+            echo "⚠️  Website returned HTTP $HTTP_CODE"
+          fi
+
+      # ============================================
+      # 12. NOTIFY SUCCESS
+      # ============================================
+      - name: 🎉 Deployment successful
+        run: |
+          echo "================================================"
+          echo "🎉 DEPLOYMENT SUCCESSFUL!"
+          echo "================================================"
+          echo ""
+          echo "🌐 Website: https://yapaket.ru"
+          echo "📅 Date: $(date)"
+          echo "📝 Commit: ${{ github.sha }}"
+          echo ""
