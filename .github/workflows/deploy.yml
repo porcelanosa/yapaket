@@ -11,11 +11,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 🔍 Debug SSH key
-        run: |
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > /tmp/test_key
-          chmod 600 /tmp/test_key
-          ssh-keygen -l -f /tmp/test_key
       # ============================================
       # 1. CHECKOUT CODE
       # ============================================
