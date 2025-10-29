@@ -1,24 +1,10 @@
-const menuToggle = document.getElementById('menu-toggle');
-const menuClose = document.getElementById('menu-close');
-const mobileMenu = document.getElementById('mobile-menu');
-const menuOverlay = document.getElementById('menu-overlay');
+// import 'virtual:svg-icons-register';
 
-function openMenu () {
-    mobileMenu.classList.add('active');
-    menuOverlay.classList.add('active');
-    menuToggle.classList.add('hamburger-active');
-    document.body.style.overflow = 'hidden';
-}
+import Alpine from 'alpinejs';
+import './mobile-menu';
 
-function closeMenu () {
-    mobileMenu.classList.remove('active');
-    menuOverlay.classList.remove('active');
-    menuToggle.classList.remove('hamburger-active');
-    document.body.style.overflow = '';
-}
+window.Alpine = Alpine;
 
-menuToggle.addEventListener('click', openMenu);
-menuClose.addEventListener('click', closeMenu);
-menuOverlay.addEventListener('click', closeMenu);
-document.addEventListener('keydown',
-    function(e) { if (e.key === 'Escape') { closeMenu(); } });
+document.addEventListener('DOMContentLoaded', () => {
+    Alpine.start();
+});

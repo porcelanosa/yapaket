@@ -2,12 +2,18 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasMenuItems;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-class Page extends Model
+class Page extends Model implements HasMedia
 {
-    protected $with = ['products'];
+    use InteractsWithMedia/*, HasMenuItems*/;
+
+//    protected $with     = ['products'];
     protected $fillable = [
       'name',
       'title',
@@ -18,6 +24,27 @@ class Page extends Model
       'sort',
       'active',
     ];
+    protected $casts    = [
+      'active' => 'boolean',
+    ];
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('page_image')->singleFile();
+    }
+
+    public function registerMediaConversions(Media|null $media = null): void
+    {
+        $this
+          ->addMediaConversion('page_thumb')
+          ->width(368)
+          ->height(232)
+//          ->sharpen(10)
+          ->format('webp')
+          ->optimize()
+//          ->nonQueued()
+        ;
+    }
 
     public function __toString(): string
     {
@@ -27,5 +54,19 @@ class Page extends Model
     public function products(): BelongsToMany
     {
         return $this->belongsToMany(Product::class, 'page_product');
+    }
+
+    /**
+     * Get the url for the page.
+     */
+    public function getUrlAttribute(): string
+    {
+        return route('pages.show', $this->slug);
+    }
+
+
+    public function scopeActive($query)
+    {
+        return $query->where('active', true);
     }
 }

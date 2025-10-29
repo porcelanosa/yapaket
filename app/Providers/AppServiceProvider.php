@@ -22,7 +22,7 @@ class AppServiceProvider extends ServiceProvider
             $view->with('contact', $settings->getContactInfo());
             $view->with('mainNav', $settings->getMainNav());
             $view->with('socials', $settings->getSocials());
-            $view->with('menuCategories', $settings->getMenuCategories());
+            $view->with('menuCategories2', $settings->getMenuCategories2());
             $view->with('mainSections', $settings->getMainSections());
             $view->with('newsArticles', $settings->getNewsArticles());
             $view->with('interestingOffers', $settings->getInterestingOffers());

@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace App\MoonShine\Resources;
 
 use App\Models\Attribute;
+use MoonShine\Contracts\UI\ActionButtonContract;
 use MoonShine\Contracts\UI\ComponentContract;
 use MoonShine\Contracts\UI\FieldContract;
 use MoonShine\Laravel\Resources\ModelResource;
@@ -68,5 +69,9 @@ class AttributeResource extends ModelResource
     protected function rules(mixed $item): array
     {
         return [];
+    }
+    protected function modifyDetailButton(ActionButtonContract $button): ActionButtonContract
+    {
+        return $button->emptyHidden();
     }
 }

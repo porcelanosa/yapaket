@@ -6,6 +6,8 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
+use MoonShine\Laravel\Http\Middleware\Authenticate;
+use MoonShine\Laravel\Http\Middleware\ChangeLocale;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -16,11 +18,21 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
 
+        // Регистрация кастомных middleware для MoonShine
+        $middleware->alias([
+          'moonshine' => ChangeLocale::class, // Middleware MoonShine для локализации
+          'auth' => Authenticate::class,      // Кастомный middleware MoonShine для аутентификации
+        ]);
         $middleware->web(append: [
             HandleAppearance::class,
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
         ]);
+
+        // Опционально: добавьте MoonShine middleware в глобальный стек, если требуется
+//        $middleware->global(append: [
+//          ChangeLocale::class,
+//        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

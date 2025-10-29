@@ -12,27 +12,48 @@
         "php": "^8.2",
         "blade-ui-kit/blade-heroicons": "*",
         "blade-ui-kit/blade-icons": "^1.8",
+        "ihxnnxs/umbra-ui": "^0.3.0",
         "inertiajs/inertia-laravel": "^2.0",
+        "intervention/image": "^3.11",
+        "intervention/image-laravel": "^1.5",
+        "laradumps/laradumps": "v4.5.2",
         "laravel/framework": "^12.0",
         "laravel/tinker": "^2.10.1",
+        "lee-to/moonshine-input-extension-char-count": "^2.0",
+        "lee-to/moonshine-tree-resource": "^2.0",
+        "moonshine/ckeditor": "^3.0",
         "moonshine/moonshine": "^3.16",
-        "tightenco/ziggy": "^2.4"
+        "moonshine/quill": "^3.0",
+        "moonshine/ru": "*",
+        "moonshine/trix": "^3.0",
+        "mr-vaco/moonshine.settings.plugin": "*",
+        "owenvoke/blade-fontawesome": "^2.9",
+        "spatie/laravel-medialibrary": "^11.15",
+        "sweet1s/moonshine-filemanager": "^1.1",
+        "tightenco/ziggy": "^2.4",
+        "timurasurov12/summernote": "^1.0",
+        "unisharp/laravel-filemanager": "^2.11",
+        "visual-ideas/moonshine-spatie-medialibrary": "^3.0"
     },
-    "require-dev": {      
+    "require-dev": {
         "barryvdh/laravel-debugbar": "^3.15",
         "barryvdh/laravel-ide-helper": "^3.5",
+        "beyondcode/laravel-query-detector": "^2.1",
         "fakerphp/faker": "^1.23",
+        "laravel/boost": "^1",
         "laravel/pail": "^1.2.2",
         "laravel/pint": "^1.18",
         "laravel/sail": "^1.41",
-        "laravel/boost": "^1",
-        "laradumps/laradumps": "v4.5.0",
         "mockery/mockery": "^1.6",
         "nunomaduro/collision": "^8.6",
         "pestphp/pest": "^4.0",
         "pestphp/pest-plugin-laravel": "^4.0"
     },
     "autoload": {
+        "files": [
+            "app/Helpers/MediaHelpers.php",
+            "app/Helpers/settings_helpers.php"
+        ],
         "psr-4": {
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",

@@ -1,0 +1,14 @@
+@layer components {
+    .hamburger-line {
+        @apply block h-0.5 w-6 bg-red-600 my-1 transition-transform duration-300 ease-in-out;
+    }
+    .hamburger-active .hamburger-line:nth-child(1) {
+        @apply rotate-45 translate-y-1.5;
+    }
+    .hamburger-active .hamburger-line:nth-child(2) {
+        @apply opacity-0;
+    }
+    .hamburger-active .hamburger-line:nth-child(3) {
+        @apply -rotate-45 -translate-y-1.5;
+    }
+}

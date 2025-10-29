@@ -1,0 +1,21 @@
+/* Принудительно устанавливаем светлую тему */
+html {
+    color-scheme: light;
+}
+
+body {
+    background-color: gray-50 !important;
+    color: black !important;
+}
+
+/* Отключаем темную тему в медиа-запросах */
+@media (prefers-color-scheme: light) {
+    html {
+        color-scheme: light;
+    }
+
+    body {
+        background-color: gray-50 !important;
+        color: black !important;
+    }
+}

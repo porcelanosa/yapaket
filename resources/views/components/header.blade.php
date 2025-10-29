@@ -1,31 +1,32 @@
 {{-- resources/views/components/header.blade.php --}}
 @props(['mainNav'=>[]])
-{{--<header class="bg-white shadow-md">--}}
-{{--    <div class="container mx-auto flex justify-between items-center py-4 px-4">--}}
-{{--        <a href="{{ url('/') }}" class="text-2xl font-bold text-red-600">--}}
-{{--            Polygraphy Portal--}}
-{{--        </a>--}}
 
-{{--        <nav class="hidden md:flex space-x-6">--}}
-{{--            @foreach($mainNav as $nav)--}}
-{{--                <a href="{{ $nav['url'] }}"--}}
-{{--                   class="text-gray-700 hover:text-red-600 font-medium">--}}
-{{--                    {{ $nav['title'] }}--}}
-{{--                </a>--}}
-{{--            @endforeach--}}
-{{--        </nav>--}}
-{{--    </div>--}}
-{{--</header>--}}
+<header class="bg-white shadow-md">
+    <div class="container mx-auto flex justify-between items-center py-4 px-4">
+        <a href="{{ url('/') }}" class="text-2xl font-bold text-red-600">
+            Polygraphy Portal
+        </a>
+
+        <nav class="hidden md:flex space-x-6">
+            @foreach($mainNav as $nav)
+                <a href="{{ $nav['url'] }}"
+                   class="text-gray-700 hover:text-red-600 font-medium">
+                    {{ $nav['title'] }}
+                </a>
+            @endforeach
+        </nav>
+    </div>
+</header>
 <!-- Header -->
 <header class="bg-white shadow-sm sticky top-0 z-30">
     <div class="container mx-auto px-4">
         <!-- Top row with logo, search, and contact -->
         <div class="flex items-center justify-between py-3">
-            <div class="flex items-center">
+            <div class="flex items-start flex-col">
                 <div class="text-2xl font-bold">
                     <span class="text-black">Ya</span><span class="bg-red-600 text-white px-1 rounded">Paket</span>
                 </div>
-                <div class="hidden md:block ml-2 text-xs text-gray-500 uppercase tracking-wide">
+                <div class="hidden md:block ml-0 text-xs text-gray-500 uppercase tracking-wide">
                     Пакеты с логотипом
                 </div>
             </div>
@@ -37,14 +38,14 @@
                 </div>
             </div>
             <!-- Contact info and mobile menu -->
-            <div class="flex items-center space-x-4">
+            <div class="flex items-center justify-between space-x-4">
                 <div class="hidden md:block text-right">
                     <div class="text-lg font-bold">+7 926 842 66 36</div>
                     <div class="text-sm text-gray-600 underline">24@youprint.ru</div>
                 </div>
-                <button class="bg-red-600 text-white px-4 py-2 text-sm font-medium">
-                    задать вопрос
-                </button>
+                <x-yp.yp-button color="red">Задать вопрос&nbsp;
+                    <x-fas-question-circle class="w-6 h-6 " />
+                </x-yp.yp-button>
                 <!-- Mobile menu button -->
                 <button id="menu-toggle" class="md:hidden p-2 focus:outline-none">
                     <div class="hamburger-line"></div>

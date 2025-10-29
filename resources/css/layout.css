@@ -1,0 +1,36 @@
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
+body {
+    @apply flex flex-col bg-gray-50;
+}
+
+.content {
+    flex: 1 0 auto;
+}
+
+.footer {
+    flex-shrink: 0;
+}
+/* Принудительно отключаем dark mode */
+@media (prefers-color-scheme: dark) {
+    :root {
+        color-scheme: light !important;
+    }
+
+    html, body {
+        background-color: white !important;
+        color: black !important;
+    }
+}
+
+/* Убедитесь, что нет dark классов */
+.dark {
+    color-scheme: light !important;
+}
+
+.dark * {
+    color-scheme: light !important;
+}

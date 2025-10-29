@@ -1,13 +1,15 @@
 {{-- resources/views/layouts/mainLayout.blade.php --}}
-        <!DOCTYPE html>
-<html lang="ru">
+
+<!DOCTYPE html>
+<html lang="ru" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'YaPaket')</title>
+    <title>@yield('title', $seoDefaultTitle) | YaPaket</title>
+    <meta content="@yield('meta_description', $seoDefaultDescription)" name="description">
     @vite('resources/css/app.css')
 </head>
-<body class="bg-gray-100 text-gray-900 antialiased">
+<body>
 
 <x-header />
 
@@ -16,6 +18,8 @@
     <x-left-sidebar class="hidden lg:block w-64 mr-6" />
 
     <main class="flex-1">
+        <x-breadcrumbs :breadcrumbs="$breadcrumbs ?? collect()" class="mb-6" />
+
         @yield('content')
     </main>
 
@@ -25,5 +29,6 @@
 <x-footer />
 
 @vite('resources/js/app.js')
+@stack('scripts')
 </body>
 </html>

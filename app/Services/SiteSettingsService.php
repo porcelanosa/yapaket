@@ -34,7 +34,7 @@ class SiteSettingsService
         ];
     }
 
-    public function getMenuCategories(): array
+    public function getMenuCategories2(): array
     {
         return [
           [

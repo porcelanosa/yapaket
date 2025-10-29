@@ -1,49 +1,16 @@
 @import 'tailwindcss';
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
-@source '../**/*.blade.php';
-@source '../**/*.js';
-@layer base {
-    html, body {
-        height: 100%;
-        margin: 0;
-    }
-    body {
-        @apply flex flex-col bg-gray-100; /* Используем цвет из палитры Tailwind */
-    }
-}
+@layer theme, base, components, utilities;
+@import './base.css' layer(base);
+@import './layout.css' layer(base);
+@import './theme.css' layer(utilities);
+@import './components/mobile-menu.css' layer(components);
+@import './components/hamburger.css' layer(components);
+@import './components/custom-photoswipe.css' layer(components);
 
-@layer components {
-    .content {
-        flex: 1 0 auto;
-    }
-    .footer {
-        flex-shrink: 0;
-    }
-    /* Переписанные классы хамбургера с использованием Tailwind */
-    .hamburger-line {
-        @apply block h-0.5 w-6 bg-red-600 my-1 transition-transform duration-300 ease-in-out;
-    }
-    .hamburger-active .hamburger-line:nth-child(1) {
-        @apply rotate-45 translate-y-1.5;
-    }
-    .hamburger-active .hamburger-line:nth-child(2) {
-        @apply opacity-0;
-    }
-    .hamburger-active .hamburger-line:nth-child(3) {
-        @apply -rotate-45 -translate-y-1.5;
-    }
+@source './vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source './**/*.blade.php';
+@source './app/View/Components/**/*.php';
+@source './vendor/ihxnnxs/umbra-ui/resources/views/**/*.blade.php';
+@source './resources/**/*.js';
 
-    .menu-overlay {
-        @apply fixed inset-0 bg-black/50 z-40 opacity-0 invisible transition-opacity duration-300 ease-in-out;
-    }
-    .menu-overlay.active {
-        @apply opacity-100 visible;
-    }
-    .mobile-menu {
-        @apply fixed inset-y-0 end-0 w-[80%] max-w-[400px] bg-gray-100 z-50 transition-transform duration-300 ease-in-out overflow-y-auto translate-x-full;
-    }
-    .mobile-menu.active {
-        @apply translate-x-0;
-    }
-}
+

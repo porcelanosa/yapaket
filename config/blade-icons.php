@@ -8,6 +8,6 @@ return [
   'class' => '',
 
   'attributes' => [
-      // 'fill' => 'currentColor',
+       'fill' => 'currentColor',
   ],
 ];

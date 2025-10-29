@@ -24,6 +24,7 @@
                 </div>
             </div>
             <!-- Services -->
+            @include('partials.footer-column-menu', ['items' => $footerMenu])
             <div>
                 <h3 class="text-lg font-semibold mb-4">Услуги</h3>
                 <ul class="space-y-2 text-sm text-gray-300">

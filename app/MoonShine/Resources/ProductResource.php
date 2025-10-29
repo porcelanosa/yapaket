@@ -4,36 +4,55 @@ declare(strict_types = 1);
 
 namespace App\MoonShine\Resources;
 
+use App\Helpers\ColorsHelper;
 use App\Models\Product;
-use Illuminate\Database\Eloquent\Builder;
+use App\MoonShine\Fields\CKEditor;
+use Illuminate\Contracts\Database\Eloquent\Builder;
+use Leeto\InputExtensionCharCount\InputExtensions\CharCount;
 use MoonShine\Contracts\UI\ActionButtonContract;
 use MoonShine\Contracts\UI\ComponentContract;
 use MoonShine\Contracts\UI\FieldContract;
 use MoonShine\Laravel\Fields\Relationships\BelongsTo;
 use MoonShine\Laravel\Fields\Relationships\BelongsToMany;
+use MoonShine\Laravel\Fields\Relationships\HasMany;
 use MoonShine\Laravel\Fields\Relationships\RelationRepeater;
 use MoonShine\Laravel\Fields\Slug;
 use MoonShine\Laravel\Resources\ModelResource;
-use MoonShine\Support\Enums\Color;
 use MoonShine\UI\Components\ActionButton;
 use MoonShine\UI\Components\Badge;
+use MoonShine\UI\Components\Collapse;
 use MoonShine\UI\Components\Layout\Box;
 use MoonShine\UI\Components\Layout\Column;
+use MoonShine\UI\Components\Layout\Flex;
 use MoonShine\UI\Components\Layout\Grid;
-use MoonShine\UI\Fields\Field;
 use MoonShine\UI\Fields\ID;
 use MoonShine\UI\Fields\Text;
 use MoonShine\UI\Fields\Textarea;
-use App\Helpers\ColorsHelper;
+
 /**
  * @extends ModelResource<Product>
  */
 class ProductResource extends ModelResource
 {
     protected string $model = Product::class;
-
+//    protected array $with = ['attributes', 'categories', 'pages'];
     protected string $title  = 'Пакеты';
     public string    $column = 'name';
+
+
+    protected function modifyQueryBuilder(Builder $builder): Builder
+    {
+        return $builder
+          ->with(['categories', 'pages']);
+    }
+
+    protected function modifyItemQueryBuilder(Builder $builder): Builder
+    {
+        return $builder
+          ->with([
+            'attributes.attribute',
+          ]);
+    }
 
     /**
      * @return list<FieldContract>
@@ -44,37 +63,32 @@ class ProductResource extends ModelResource
           ID::make()->sortable(),
           Text::make('Название', 'name')->sortable(),
           BelongsToMany::make('Категории', 'categories', CategoryResource::class)
-            ->changePreview(
-              function ($values, $ctx) {
-                  $return = '';
-                  foreach ($values as $value) {
-                      $return.= Badge::make(
-                        $value->name, ColorsHelper::getColorFromString($value->name)->value
-                      )->style(['margin-right: 1rem; margin-bottom:.5rem;']);
-                  }
-                  return $return;
-              }
-            )
-        ,
+                       ->changePreview(
+                         function ($values, $ctx) {
+                             $return = '';
+                             foreach ($values as $value) {
+                                 $return .= Badge::make(
+                                   $value->name,
+                                   ColorsHelper::getColorFromString($value->name)->value,
+                                 )->style(['margin-right: 1rem; margin-bottom:.5rem;']);
+                             }
+
+                             return $return;
+                         },
+                       )
+            ,
           BelongsToMany::make('Страницы', 'pages', PageResource::class)
-            ->changePreview(
-              function ($values) {
-                  $return = '';
-                  foreach ($values as $value) {
-                      $return.= Badge::make($value->name, ColorsHelper::getColorFromString($value->name)->value);
-                  }
-                  return $return;
-              }
-            )
-            ->relatedLink('products')
-//            ->inLine(
-//              separator: ' ',
-//              badge: true
-//            )
-//            ->columnLabel('')
-//                          ->fields([
-//                            Text::make('Название', 'name'),
-//                          ])
+                       ->changePreview(
+                         function ($values) {
+                             $return = '';
+                             foreach ($values as $value) {
+                                 $return .= Badge::make($value->name, ColorsHelper::getColorFromString($value->name)->value);
+                             }
+
+                             return $return;
+                         },
+                       )
+                       ->relatedLink('products'),
         ];
     }
 
@@ -90,10 +104,23 @@ class ProductResource extends ModelResource
                 Box::make([
                   ID::make()->disabled(),
                   Text::make('Name', 'name')->reactive()->required(),
-                  Slug::make('Заголовок браузера', 'title')->from('name')->unique()->live(),
-                  Textarea::make('Meta Description', 'meta_description')->required(),
+                  Text::make('Заголовок браузера', 'title')->required(),
+                  Slug::make('ЧПУ (URL)', 'slug')->from('name')->unique()->live(),
+                  Text::make('Meta Description', 'meta_description')
+                      ->extension(new CharCount()),
+
+                  Collapse::make('Цена и тираж:', [
+//                    Heading::make('Цена и тираж:'),
+                    Flex::make([
+                      Text::make('Цена от:', 'price')->withoutWrapper(),
+                      Text::make('Тираж от:', 'circulation')->withoutWrapper(),
+                    ])
+                        ->name('flex-titles')
+                        ->justifyAlign('start')
+                        ->itemsAlign('start'),
+                  ]),
                   Textarea::make('Анонс', 'short_description')->required(),
-                  Textarea::make('полное описание', 'description')->required(),
+                  CKEditor::make('Полное описание', 'description')->withFileManager()->placeholderText('Полное описание товара ...'),
                 ],
                 ),
               ],
@@ -110,34 +137,88 @@ class ProductResource extends ModelResource
 
                   // 🔗 Связь со страницами
                 BelongsToMany::make('Страницы', 'pages', resource: PageResource::class)
-//                             ->selectMode()
-                             ->horizontalMode(true, minColWidth: '100px', maxColWidth: '50%')
                              ->creatable(button: ActionButton::make('Добавить страницу', ''))
-                             ->inLine(),
+                             ->searchable()
+                             ->selectMode(),
                 RelationRepeater::make(
                   'Свойства',     // Заголовок
                   'attributes',     // Название связи в модели Product
                   resource: ProductAttributeResource::class,
                 )->fields([
-                  ID::make()->readonly()->style(['display: none']),
+                  ID::make(),
                   BelongsTo::make('Свойство', 'attribute', 'label'),
                   Text::make('Значение', 'value')->required(),
                 ])
-                  //->vertical()
                                 ->removable()
-//                                ->modifyItemButtons(
-//                  fn(ActionButton $detail, $edit, $delete, $massDelete, HasMany $ctx) => [$edit, $delete, $massDelete],
-//                )
-//                  ->disableOutside()
-                  //->withoutModals()
-                  //->searchable()      // делаем поля searchable
-                                ->creatable(),      // разрешаем создание новых прямо из формы
+                                ->creatable(),
               ],
 
               colSpan        : 4,
               adaptiveColSpan: 12,
             ),
           ]),
+//          Box::make('Галерея изображений', [
+////            RelationRepeater::make('Изображения', 'images', resource: ProductImageResource::class)
+//            RelationRepeater::make(
+//              '',     // Заголовок
+//              'productImages',     // Название связи в модели Product
+//              resource: ProductImageResource::class,
+//            )
+//                            ->fields([
+//                              ID::make()->readonly(),
+//                              Image::make('Изображение', 'path')
+//                                   ->disk('public')
+//                                   ->dir('images/products')
+//                                   ->removable()
+//                                   ->required()
+//                                ->changeFill(function (ProductImage $data, Image $field) {
+//                                    // return $data->images->pluck('file');
+//                                    // или raw
+//                                    return $data->path;
+//                                })
+//                                   ->onApply(function (ProductImage $data): ProductImage {
+//                                       return $data;
+//                                   })
+//                                   ->onAfterApply(function (ProductImage $data, false|array $values, Image $field) {
+//                                       Log::info('Data: ', $data->toArray());
+//
+////                                       return $data;
+//                                   }),
+//
+//                              Text::make('Название', 'title'),
+//                              Text::make('Alt', 'alt'),
+////                              Textarea::make('Описание', 'caption'),
+//                              Number::make('Сортировка', 'sort')->default(0),
+//                              Switcher::make('Главное', 'is_primary')->default(true),
+//                            ])
+//                            ->creatable(limit: 20)
+//                            ->removable()
+////                            ->reorderable('sort')
+////                            ->vertical(),
+//
+////            MorphMany::make(
+////              'Галерея',
+////              'images',
+////              resource: ImageResource::class
+////            )->creatable()
+//          ]),
+          HasMany::make('Изображения', 'productImages', resource: ProductImageResource::class)
+//                 ->searchable(false)
+                 ->async()
+                 ->modifyItemButtons(
+              fn(ActionButton $detail, $edit, $delete, $massDelete, HasMany $ctx) => [$edit, $delete],
+            )
+                 ->modifyCreateButton(
+                   fn(ActionButton $button) => $button->setLabel('Добавить изображение в галерею'),
+                 )
+                 ->modifyEditButton(
+                   fn(ActionButton $button) => $button->setLabel('Изменить'),
+                 )
+                 ->creatable(true),
+
+          BelongsToMany::make('Похожие товары', 'relatedProducts', resource: self::class)
+                       ->selectMode()
+                       ->searchable(),
         ];
     }
 
@@ -147,7 +228,7 @@ class ProductResource extends ModelResource
     protected function detailFields(): iterable
     {
         return [
-          ID::make(),
+//          ID::make(),
         ];
     }
 
@@ -161,5 +242,10 @@ class ProductResource extends ModelResource
     protected function rules(mixed $item): array
     {
         return [];
+    }
+
+    protected function modifyDetailButton(ActionButtonContract $button): ActionButtonContract
+    {
+        return $button->emptyHidden();
     }
 }

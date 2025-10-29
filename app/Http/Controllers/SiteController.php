@@ -23,7 +23,7 @@ class SiteController extends Controller
             ['type' => 'vk', 'url' => '#', 'color' => 'bg-blue-600'],
             ['type' => 'telegram', 'url' => '#', 'color' => 'bg-blue-800'],
           ],
-          'menuCategories' => [
+          'menuCategories2' => [
             [
               'title' => 'Печать',
               'items' => [

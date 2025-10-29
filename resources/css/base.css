@@ -1,0 +1,186 @@
+[x-cloak] {
+    display: none !important;
+}
+
+:root {
+    --rhythm-unit: 1rem; /* = base line-height */
+    --text-base--line-height: 1.1;
+}
+
+a {
+    @apply text-red-600 underline hover:text-red-700 hover:no-underline transition-all;
+    /*transition: all 0.2s ease-in-out; !* Добавлено для плавного перехода *!*/
+}
+p {
+    font-size: var(--text-base);
+    line-height: var(--text-base--line-height); /* 1.5 */
+    margin-top: 0;
+    margin-bottom: var(--rhythm-unit);
+}
+
+h1 {
+    font-size: var(--text-4xl); /* 2.25rem */
+    font-weight: var(--font-weight-bold);
+    line-height: 3rem; /* 2 × rhythm */
+    margin-top: calc(var(--rhythm-unit) * 3); /* 3 × rhythm */
+    margin-bottom: var(--rhythm-unit); /* 1 × rhythm */
+}
+
+h2 {
+    font-size: var(--text-3xl); /* 1.875rem */
+    font-weight: var(--font-weight-semibold);
+    line-height: calc(var(--rhythm-unit) * 2); /* 2 × rhythm */
+    margin-top: calc(var(--rhythm-unit) * 2); /* 2 × rhythm */
+    margin-bottom: var(--rhythm-unit); /* 1 × rhythm */
+}
+
+h3 {
+    font-size: var(--text-2xl); /* 1.5rem */
+    font-weight: var(--font-weight-semibold);
+    line-height: var(--rhythm-unit); /* 1 × rhythm — плотно, но допустимо */
+    margin-top: calc(var(--rhythm-unit) * 2); /* 2 × rhythm */
+    margin-bottom: calc(var(--rhythm-unit) * 1); /* 1 × rhythm */
+}
+
+h4 {
+    font-size: var(--text-xl); /* 1.25rem */
+    font-weight: var(--font-weight-medium);
+    line-height: calc(var(--rhythm-unit) * 1); /* 1 × rhythm */
+    margin-top: calc(var(--rhythm-unit) * 1); /* 1 × rhythm */
+    margin-bottom: calc(var(--rhythm-unit) * 1);
+}
+
+h5 {
+    font-size: var(--text-lg); /* 1.125rem */
+    font-weight: var(--font-weight-medium);
+    line-height: calc(var(--rhythm-unit) * 1);
+    margin-top: calc(var(--rhythm-unit) * 1);;
+    margin-bottom: calc(var(--rhythm-unit) * 1);
+}
+
+h6 {
+    font-size: var(--text-base); /* 1rem */
+    font-weight: var(--font-weight-bold);
+    line-height: calc(var(--rhythm-unit) * 1);
+    margin-top: calc(var(--rhythm-unit) * 1);;
+    margin-bottom: calc(var(--rhythm-unit) * 1);
+}
+
+/* Дополнительно: списки */
+ul, ol {
+    margin-top: 0;
+    margin-bottom: var(--rhythm-unit);
+    padding-left: 1.5rem;
+}
+
+/* Цитаты */
+blockquote {
+    border-left: 5px solid var(--color-gray-600);
+    margin-top: 0;
+    margin-bottom: var(--rhythm-unit);
+    font-size: var(--text-lg);
+    line-height: var(--text-lg--line-height); /* ≈1.555 → не кратно! */
+    /* Лучше принудительно: */
+    /*line-height: 1.5rem;*/
+    padding-left: 1.5em;
+    padding-right: 1.5em;
+    font-style: italic;
+}
+.image {
+    clear: both;
+    display: table;
+    margin: .9em auto;
+    min-width: 50px;
+    text-align: center;
+}
+.image.image-style-align-left, img.image-style-align-left {
+    float: left;
+    margin-right: var(--rhythm-unit);
+}
+.image.image-style-side, img.image-style-side {
+    float: right;
+    margin-left: var(--rhythm-unit);
+}
+blockquote {
+    border-left: 5px solid #ccc;
+    font-style: italic;
+    margin-left: 0;
+    margin-right: 0;
+    overflow: hidden;
+    padding-left: 1.5em;
+    padding-right: 1.5em;
+}
+/* Применяем стили сайта к содержимому CKEditor */
+.ck-content {
+    p {
+        font-size: var(--text-base);
+        line-height: var(--text-base--line-height); /* 1.5 */
+        margin-top: 0;
+        margin-bottom: var(--rhythm-unit);
+    }
+
+    h1 {
+        font-size: var(--text-4xl); /* 2.25rem */
+        font-weight: var(--font-weight-bold);
+        line-height: 3rem; /* 2 × rhythm */
+        margin-top: calc(var(--rhythm-unit) * 3); /* 3 × rhythm */
+        margin-bottom: var(--rhythm-unit); /* 1 × rhythm */
+    }
+
+    h2 {
+        font-size: var(--text-3xl); /* 1.875rem */
+        font-weight: var(--font-weight-semibold);
+        line-height: calc(var(--rhythm-unit) * 2); /* 2 × rhythm */
+        margin-top: calc(var(--rhythm-unit) * 2); /* 2 × rhythm */
+        margin-bottom: var(--rhythm-unit); /* 1 × rhythm */
+    }
+
+    h3 {
+        font-size: var(--text-2xl); /* 1.5rem */
+        font-weight: var(--font-weight-semibold);
+        line-height: var(--rhythm-unit); /* 1 × rhythm — плотно, но допустимо */
+        margin-top: calc(var(--rhythm-unit) * 2); /* 2 × rhythm */
+        margin-bottom: calc(var(--rhythm-unit) * 1); /* 1 × rhythm */
+    }
+
+    h4 {
+        font-size: var(--text-xl); /* 1.25rem */
+        font-weight: var(--font-weight-medium);
+        line-height: calc(var(--rhythm-unit) * 1); /* 1 × rhythm */
+        margin-top: calc(var(--rhythm-unit) * 1); /* 1 × rhythm */
+        margin-bottom: calc(var(--rhythm-unit) * 1);
+    }
+
+    h5 {
+        font-size: var(--text-lg); /* 1.125rem */
+        font-weight: var(--font-weight-medium);
+        line-height: calc(var(--rhythm-unit) * 1);
+        margin-top: calc(var(--rhythm-unit) * 1);;
+        margin-bottom: calc(var(--rhythm-unit) * 1);
+    }
+
+    h6 {
+        font-size: var(--text-base); /* 1rem */
+        font-weight: var(--font-weight-bold);
+        line-height: calc(var(--rhythm-unit) * 1);
+        margin-top: calc(var(--rhythm-unit) * 1);;
+        margin-bottom: calc(var(--rhythm-unit) * 1);
+    }
+
+    /* Дополнительно: списки */
+    ul, ol {
+        margin-top: 0;
+        margin-bottom: var(--rhythm-unit);
+        padding-left: 1.5rem;
+    }
+
+    /* Цитаты */
+    blockquote {
+        margin-top: 0;
+        margin-bottom: var(--rhythm-unit);
+        font-size: var(--text-lg);
+        line-height: var(--text-lg--line-height); /* ≈1.555 → не кратно! */
+        /* Лучше принудительно: */
+        /*line-height: 1.5rem;*/
+    }
+}
