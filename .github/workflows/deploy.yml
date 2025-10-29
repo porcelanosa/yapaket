@@ -81,7 +81,9 @@ jobs:
             --exclude='tailwind.config.js' \
             --exclude='postcss.config.js' \
             .
+          mv ../deploy.tar.gz ./deploy.tar.gz
           echo "✅ Archive created successfully"
+          ls -lh deploy.tar.gz
 
       # ============================================
       # 8. SETUP SSH
