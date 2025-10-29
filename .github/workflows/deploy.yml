@@ -114,7 +114,7 @@ jobs:
       # ============================================
       - name: 🎯 Deploy application on server
         run: |
-          scp -o HostKeyAlgorithms=+ssh-rsa -p ${{ secrets.SSH_PORT }} -i ~/.ssh/deploy_key ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} << 'ENDSSH'
+          ssh -o HostKeyAlgorithms=+ssh-rsa -p ${{ secrets.SSH_PORT }} -i ~/.ssh/deploy_key ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} << 'ENDSSH'
             set -e
           
             echo "================================================"
