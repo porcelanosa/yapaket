@@ -11,11 +11,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 🔍 Debug SSH key
-        run: |
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > /tmp/test_key
-          chmod 600 /tmp/test_key
-          ssh-keygen -l -f /tmp/test_key
       # ============================================
       # 1. CHECKOUT CODE
       # ============================================
@@ -85,6 +80,14 @@ jobs:
             --exclude='vite.config.js' \
             --exclude='tailwind.config.js' \
             --exclude='postcss.config.js' \
+            --exclude='eslint.config.js' \
+            --exclude='components.json' \
+            --exclude='.mcp.json' \
+            --exclude='.prettierrc' \
+            --exclude='.prettierignore' \
+            --exclude='.editorconfig' \
+            --exclude='yapaket.local.key.pem' \
+            --exclude='yapaket.local.pem' \
             .
           mv ../deploy.tar.gz ./deploy.tar.gz
           echo "✅ Archive created successfully"
