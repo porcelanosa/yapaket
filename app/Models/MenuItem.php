@@ -65,8 +65,9 @@ class MenuItem extends Model
     public function getUurlAttribute($value)
     {
         if ($this->menuable) {
-            $appUrl = config('app.url');
-            return str_replace($appUrl, '', $this->menuable->url);
+//            $appUrl = config('app.url');
+//            return str_replace($appUrl, '', $this->menuable->url);
+            return parse_url($this->menuable->url, PHP_URL_PATH);
         }
         
         if ($this->route) {
