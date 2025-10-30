@@ -9,7 +9,7 @@ use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
 use MoonShine\Laravel\Http\Middleware\Authenticate;
 use MoonShine\Laravel\Http\Middleware\ChangeLocale;
 
-return Application::configure(basePath: dirname(__DIR__))
+return $app = Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
         commands: __DIR__.'/../routes/console.php',
@@ -37,3 +37,11 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withExceptions(function (Exceptions $exceptions) {
         //
     })->create();
+
+// Устанавливаем путь к public директории из .env
+//$publicPath = env('PUBLIC_PATH', 'public');
+//if ($publicPath !== 'public') {
+//    $app->usePublicPath(realpath($app->basePath($publicPath)));
+//}
+//
+//return $app;

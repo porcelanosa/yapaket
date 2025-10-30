@@ -17,6 +17,15 @@ class AppServiceProvider extends ServiceProvider
     }
     public function boot(SiteSettingsService $settings): void
     {
+        // Устанавливаем путь к public директории
+        $publicPath = config('app.public_path', 'public');
+
+        if ($publicPath !== 'public') {
+            $fullPath = base_path($publicPath);
+            if (is_dir($fullPath)) {
+                $this->app->usePublicPath($fullPath);
+            }
+        }
 
         View::composer('*', function ($view) use ($settings) {
             $view->with('contact', $settings->getContactInfo());

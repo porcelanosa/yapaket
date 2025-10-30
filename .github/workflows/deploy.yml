@@ -24,7 +24,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.4'
-          extensions: mbstring, xml, ctype, iconv, intl, pdo_mysql, dom, filter, gd, json, zip, pdo_mysql, zip, exif, pdo
+          extensions: mbstring, xml, ctype, iconv, intl, pdo_mysql, dom, filter, gd, json, zip, exif, pdo
           tools: composer:v2
 
       # ============================================
@@ -55,12 +55,14 @@ jobs:
         run: npm run build
 
       # ============================================
-      # 7. CREATE DEPLOYMENT ARCHIVE
+      # 7. CREATE DEPLOYMENT ARCHIVES
       # ============================================
-      - name: 📦 Create deployment archive
+      - name: 📦 Create deployment archives
         run: |
-          echo "Creating deployment archive..."
-          tar -czf ../deploy.tar.gz \
+          echo "Creating deployment archives..."
+          
+          # Архив для корневой директории (всё кроме public)
+          tar -czf ../app.tar.gz \
             --exclude='.git' \
             --exclude='.github' \
             --exclude='.junie' \
@@ -90,11 +92,17 @@ jobs:
             --exclude='.editorconfig' \
             --exclude='yapaket.local.key.pem' \
             --exclude='yapaket.local.pem' \
-            --exclude='docs' \
+            --exclude='public' \
             .
-          mv ../deploy.tar.gz ./deploy.tar.gz
-          echo "✅ Archive created successfully"
-          ls -lh deploy.tar.gz
+          
+          # Архив для директории public (будет в docs)
+          tar -czf ../public.tar.gz public/
+          
+          mv ../app.tar.gz ./app.tar.gz
+          mv ../public.tar.gz ./public.tar.gz
+          
+          echo "✅ Archives created successfully"
+          ls -lh app.tar.gz public.tar.gz
 
       # ============================================
       # 8. SETUP SSH
@@ -111,8 +119,9 @@ jobs:
       # ============================================
       - name: 🚀 Upload files to server
         run: |
-          echo "Uploading deployment archive..."
-          scp -o HostKeyAlgorithms=+ssh-rsa -P ${{ secrets.SSH_PORT }} -i ~/.ssh/deploy_key deploy.tar.gz ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:/tmp/yapaket-deploy.tar.gz
+          echo "Uploading deployment archives..."
+          scp -o HostKeyAlgorithms=+ssh-rsa -P ${{ secrets.SSH_PORT }} -i ~/.ssh/deploy_key app.tar.gz ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:/tmp/yapaket-app.tar.gz
+          scp -o HostKeyAlgorithms=+ssh-rsa -P ${{ secrets.SSH_PORT }} -i ~/.ssh/deploy_key public.tar.gz ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:/tmp/yapaket-public.tar.gz
           echo "✅ Upload completed"
 
       # ============================================
@@ -128,99 +137,197 @@ jobs:
             echo "================================================"
           
             # Переменные
-            DEPLOY_PATH="${{ secrets.DEPLOY_PATH }}"
+            APP_PATH="/home/youprint/yapaket.ru"
+            DOCS_PATH="/home/youprint/yapaket.ru/docs"
             TIMESTAMP=$(date +%Y%m%d-%H%M%S)
-            BACKUP_DIR="${DEPLOY_PATH}/backups"
+            BACKUP_DIR="${APP_PATH}/backups"
           
-            # Создаем директорию для бэкапов
+            # Создаем директории
             mkdir -p ${BACKUP_DIR}
+            mkdir -p ${DOCS_PATH}
           
             # ============================================
             # BACKUP CURRENT VERSION
             # ============================================
             echo ""
             echo "📦 Creating backup of current version..."
-            if [ -f "${DEPLOY_PATH}/composer.json" ]; then
-              cd ${DEPLOY_PATH}
-              tar -czf ${BACKUP_DIR}/backup-${TIMESTAMP}.tar.gz \
+            if [ -f "${APP_PATH}/composer.json" ]; then
+              cd ${APP_PATH}
+              tar -czf ${BACKUP_DIR}/backup-app-${TIMESTAMP}.tar.gz \
                 --exclude='storage/logs/*' \
                 --exclude='storage/framework/cache/*' \
                 --exclude='storage/framework/sessions/*' \
                 --exclude='storage/framework/views/*' \
                 --exclude='vendor' \
                 --exclude='node_modules' \
-                . 2>/dev/null || echo "⚠️  Backup skipped (first deploy?)"
-              echo "✅ Backup created: backup-${TIMESTAMP}.tar.gz"
+                --exclude='docs' \
+                --exclude='backups' \
+                . 2>/dev/null || echo "⚠️  App backup skipped"
           
-              # Удаляем старые бэкапы (оставляем последние 5)
+              if [ -d "${DOCS_PATH}" ] && [ "$(ls -A ${DOCS_PATH})" ]; then
+                cd ${DOCS_PATH}
+                tar -czf ${BACKUP_DIR}/backup-docs-${TIMESTAMP}.tar.gz . 2>/dev/null || echo "⚠️  Docs backup skipped"
+              fi
+          
+              echo "✅ Backups created"
+          
+              # Удаляем старые бэкапы (оставляем последние 5 комплектов = 10 файлов)
               cd ${BACKUP_DIR}
-              ls -t backup-*.tar.gz | tail -n +6 | xargs -r rm
+              ls -t backup-*.tar.gz | tail -n +11 | xargs -r rm
               echo "✅ Old backups cleaned"
             else
               echo "⚠️  No existing installation found, skipping backup"
             fi
           
             # ============================================
-            # EXTRACT NEW VERSION
+            # SAVE IMPORTANT FILES
             # ============================================
             echo ""
-            echo "📂 Extracting new version..."
-            cd ${DEPLOY_PATH}
+            echo "💾 Saving important files..."
           
-            # Сохраняем важные файлы
-            if [ -f ".env" ]; then
-              cp .env /tmp/.env.backup
+            # Сохраняем .env
+            if [ -f "${APP_PATH}/.env" ]; then
+              cp ${APP_PATH}/.env /tmp/.env.backup
               echo "✅ .env backed up"
             fi
           
-            if [ -d "storage" ]; then
+            # Сохраняем storage
+            if [ -d "${APP_PATH}/storage" ]; then
               mkdir -p /tmp/storage-backup
-              cp -r storage/app /tmp/storage-backup/ 2>/dev/null || true
-              cp -r storage/logs /tmp/storage-backup/ 2>/dev/null || true
-              echo "✅ storage backed up"
+              if [ -d "${APP_PATH}/storage/app" ]; then
+                cp -r ${APP_PATH}/storage/app /tmp/storage-backup/ 2>/dev/null || true
+                echo "✅ storage/app backed up"
+              fi
+              if [ -d "${APP_PATH}/storage/logs" ]; then
+                cp -r ${APP_PATH}/storage/logs /tmp/storage-backup/ 2>/dev/null || true
+                echo "✅ storage/logs backed up"
+              fi
             fi
           
-            # Распаковываем новую версию
-            tar -xzf /tmp/yapaket-deploy.tar.gz -C ${DEPLOY_PATH}
-            rm /tmp/yapaket-deploy.tar.gz
-            echo "✅ New version extracted"
+            # ============================================
+            # EXTRACT APPLICATION FILES
+            # ============================================
+            echo ""
+            echo "📂 Extracting application files..."
+            cd ${APP_PATH}
+            tar -xzf /tmp/yapaket-app.tar.gz
+            rm /tmp/yapaket-app.tar.gz
+            echo "✅ Application extracted to ${APP_PATH}"
           
-            # Восстанавливаем важные файлы
+            # ============================================
+            # EXTRACT PUBLIC FILES TO DOCS
+            # ============================================
+            echo ""
+            echo "📂 Extracting public files to docs..."
+          
+            # Очищаем docs, но сохраняем .htaccess если он есть
+            if [ -f "${DOCS_PATH}/.htaccess" ]; then
+              cp ${DOCS_PATH}/.htaccess /tmp/.htaccess.backup
+            fi
+          
+            cd ${DOCS_PATH}
+            rm -rf *
+          
+            # Распаковываем public в docs
+            tar -xzf /tmp/yapaket-public.tar.gz --strip-components=1
+            rm /tmp/yapaket-public.tar.gz
+          
+            # Восстанавливаем .htaccess если был
+            if [ -f "/tmp/.htaccess.backup" ]; then
+              mv /tmp/.htaccess.backup ${DOCS_PATH}/.htaccess
+              echo "✅ .htaccess restored"
+            fi
+          
+            echo "✅ Public files extracted to ${DOCS_PATH}"
+          
+            # ============================================
+            # RESTORE IMPORTANT FILES
+            # ============================================
+            echo ""
+            echo "♻️  Restoring important files..."
+          
+            # Восстанавливаем .env
             if [ -f "/tmp/.env.backup" ]; then
-              mv /tmp/.env.backup ${DEPLOY_PATH}/.env
+              mv /tmp/.env.backup ${APP_PATH}/.env
               echo "✅ .env restored"
             fi
           
+            # Восстанавливаем storage/app
             if [ -d "/tmp/storage-backup/app" ]; then
-              cp -r /tmp/storage-backup/app/* ${DEPLOY_PATH}/storage/app/ 2>/dev/null || true
+              mkdir -p ${APP_PATH}/storage/app
+              cp -r /tmp/storage-backup/app/* ${APP_PATH}/storage/app/ 2>/dev/null || true
               echo "✅ storage/app restored"
             fi
           
+            # Восстанавливаем storage/logs
             if [ -d "/tmp/storage-backup/logs" ]; then
-              cp -r /tmp/storage-backup/logs/* ${DEPLOY_PATH}/storage/logs/ 2>/dev/null || true
+              mkdir -p ${APP_PATH}/storage/logs
+              cp -r /tmp/storage-backup/logs/* ${APP_PATH}/storage/logs/ 2>/dev/null || true
               echo "✅ storage/logs restored"
             fi
           
+            # Удаляем временные файлы
             rm -rf /tmp/storage-backup
+          
+            # ============================================
+            # CONFIGURE ENVIRONMENT
+            # ============================================
+            echo ""
+            echo "🔧 Configuring environment..."
+            cd ${APP_PATH}
+          
+            # Устанавливаем production environment
+            if [ -f ".env" ]; then
+              # Проверяем и устанавливаем APP_ENV=production
+              if grep -q "^APP_ENV=" .env; then
+                sed -i 's/^APP_ENV=.*/APP_ENV=production/' .env
+              else
+                echo "APP_ENV=production" >> .env
+              fi
+              echo "✅ APP_ENV=production set"
+          
+              # Добавляем PUBLIC_PATH для явности (хотя AppServiceProvider использует окружение)
+              if ! grep -q "^PUBLIC_PATH=" .env; then
+                echo "PUBLIC_PATH=docs" >> .env
+                echo "✅ PUBLIC_PATH=docs added to .env"
+              fi
+            fi
+          
+            # ============================================
+            # CREATE STORAGE SYMLINK
+            # ============================================
+            echo ""
+            echo "🔗 Creating storage symlink..."
+          
+            # Удаляем старый симлинк если есть
+            if [ -L "${DOCS_PATH}/storage" ]; then
+              rm ${DOCS_PATH}/storage
+            fi
+          
+            # Создаем новый симлинк
+            ln -s ${APP_PATH}/storage/app/public ${DOCS_PATH}/storage
+            echo "✅ Storage symlink created: ${DOCS_PATH}/storage -> ${APP_PATH}/storage/app/public"
           
             # ============================================
             # SET PERMISSIONS
             # ============================================
             echo ""
             echo "🔒 Setting permissions..."
-            cd ${DEPLOY_PATH}
+            cd ${APP_PATH}
           
-            # Создаем необходимые директории
+            # Создаем необходимые директории в storage
             mkdir -p storage/framework/cache/data
             mkdir -p storage/framework/sessions
             mkdir -p storage/framework/views
             mkdir -p storage/logs
+            mkdir -p storage/app/public
             mkdir -p bootstrap/cache
           
             # Устанавливаем права
-            chmod -R 755 storage bootstrap/cache
+            chmod -R 755 storage bootstrap/cache docs
             chmod -R 775 storage/framework
             chmod -R 775 storage/logs
+            chmod -R 775 storage/app/public
           
             echo "✅ Permissions set"
           
@@ -229,26 +336,20 @@ jobs:
             # ============================================
             echo ""
             echo "⚙️  Running Laravel commands..."
-            cd ${DEPLOY_PATH}
-          
-            # Создаем символическую ссылку для storage (если не существует)
-            if [ ! -L "public/storage" ]; then
-              php artisan storage:link
-              echo "✅ Storage link created"
-            fi
+            cd ${APP_PATH}
           
             # Запускаем миграции
             php artisan migrate --force
             echo "✅ Migrations completed"
           
-            # Очищаем старый кеш
+            # Очищаем кеш
             php artisan cache:clear
             php artisan config:clear
             php artisan route:clear
             php artisan view:clear
             echo "✅ Cache cleared"
           
-            # Создаем новый кеш
+            # Оптимизируем кеш
             php artisan config:cache
             php artisan route:cache
             php artisan view:cache
@@ -259,7 +360,7 @@ jobs:
             echo "✅ Autoloader optimized"
           
             # ============================================
-            # RELOAD PHP-FPM (если есть права)
+            # RELOAD PHP-FPM
             # ============================================
             echo ""
             echo "🔄 Reloading PHP-FPM..."
@@ -278,15 +379,17 @@ jobs:
             # ============================================
             echo ""
             echo "🧹 Cleaning up..."
-            cd ${DEPLOY_PATH}
+            cd ${APP_PATH}
           
             # Удаляем ненужные файлы
-            rm -f deploy.tar.gz
             rm -rf tests
             rm -f phpunit.xml
           
             echo "✅ Cleanup completed"
           
+            # ============================================
+            # DEPLOYMENT SUMMARY
+            # ============================================
             echo ""
             echo "================================================"
             echo "✅ Deployment completed successfully!"
@@ -294,8 +397,25 @@ jobs:
             echo ""
             echo "📊 Deployment info:"
             echo "  - Timestamp: ${TIMESTAMP}"
-            echo "  - Deploy path: ${DEPLOY_PATH}"
-            echo "  - Backup: ${BACKUP_DIR}/backup-${TIMESTAMP}.tar.gz"
+            echo "  - App path: ${APP_PATH}"
+            echo "  - Docs path: ${DOCS_PATH}"
+            echo "  - Environment: production"
+            echo "  - Backup: ${BACKUP_DIR}/backup-*-${TIMESTAMP}.tar.gz"
+            echo ""
+            echo "📁 Directory structure:"
+            echo "  ${APP_PATH}/"
+            echo "  ├── app/"
+            echo "  ├── bootstrap/"
+            echo "  ├── config/"
+            echo "  ├── database/"
+            echo "  ├── routes/"
+            echo "  ├── storage/"
+            echo "  ├── vendor/"
+            echo "  ├── .env"
+            echo "  └── docs/           ← public web directory"
+            echo "      ├── index.php"
+            echo "      ├── build/"
+            echo "      └── storage/    ← symlink to ../storage/app/public"
             echo ""
             echo "🌐 Website: https://yapaket.ru"
             echo ""
@@ -307,11 +427,13 @@ jobs:
       - name: ✅ Verify deployment
         run: |
           echo "Checking website status..."
+          sleep 5
           HTTP_CODE=$(curl -o /dev/null -s -w "%{http_code}\n" https://yapaket.ru)
           if [ "$HTTP_CODE" == "200" ] || [ "$HTTP_CODE" == "301" ] || [ "$HTTP_CODE" == "302" ]; then
             echo "✅ Website is accessible (HTTP $HTTP_CODE)"
           else
             echo "⚠️  Website returned HTTP $HTTP_CODE"
+            exit 1
           fi
 
       # ============================================
@@ -326,4 +448,9 @@ jobs:
           echo "🌐 Website: https://yapaket.ru"
           echo "📅 Date: $(date)"
           echo "📝 Commit: ${{ github.sha }}"
+          echo "👤 Author: ${{ github.actor }}"
+          echo ""
+          echo "📋 Deployed changes:"
+          git log -1 --pretty=format:"  %s" ${{ github.sha }}
+          echo ""
           echo ""
