@@ -42,8 +42,21 @@ class Page extends Model implements HasMedia
 //          ->sharpen(10)
           ->format('webp')
           ->optimize()
-//          ->nonQueued()
+          ->nonQueued()
         ;
+        $this
+          ->addMediaConversion('original_page_webp')
+          ->format('webp')
+          ->withResponsiveImages()
+          ->optimize()
+          ->nonQueued()
+          ->performOnCollections('page_image');
+
+        $this
+          ->addMediaConversion('original_page')
+          ->optimize()
+          ->nonQueued()
+          ->performOnCollections('page_image');
     }
 
     public function __toString(): string
