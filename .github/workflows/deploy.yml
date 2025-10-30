@@ -90,6 +90,7 @@ jobs:
             --exclude='.editorconfig' \
             --exclude='yapaket.local.key.pem' \
             --exclude='yapaket.local.pem' \
+            --exclude='docs' \
             .
           mv ../deploy.tar.gz ./deploy.tar.gz
           echo "✅ Archive created successfully"
