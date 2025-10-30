@@ -15,7 +15,7 @@ final class CKEditorServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        $this->loadViewsFrom('../resources/views/fields/ckeditor', 'porcelanosa-ckeditor');
+        $this->loadViewsFrom(resource_path('views/fields/ckeditor'), 'porcelanosa-ckeditor');
 
 
         $this->publishes([

@@ -1,7 +1,7 @@
 {{-- resources/views/components/header.blade.php --}}
 @props(['mainNav'=>[]])
 
-<subheader class="bg-white border-0">
+<subheader class="sticky top-0 z-30 bg-white border-0">
     <div class="container mx-auto flex justify-between items-center py-4 px-4">
         <a href="{{ url('/') }}" class="text-2xl font-bold text-red-600">
             Производство брендированных пакетов.
@@ -17,15 +17,16 @@
         </nav>
     </div>
 </subheader>
-<!-- Header -->
-<header class="bg-white shadow-sm sticky top-0 z-30">
+<header class="bg-white shadow-sm">
     <div class="container mx-auto px-4">
         <!-- Top row with logo, search, and contact -->
         <div class="flex items-center justify-between py-3">
             <div class="flex items-start flex-col">
                 <a href="/" title="на главную страницу пакетов с логотипом" class="no-underline">
+
                     <div class="text-2xl font-bold">
-                        <span class="text-black">Ya</span><span class="bg-red-600 text-white px-1 rounded">Paket</span>
+                        <x-svgicon name="yapaket-logo" class="w-32 h-16 "/>
+                        {{--<span class="text-black">Ya</span><span class="bg-red-600 text-white px-1 rounded">Paket</span>--}}
                     </div>
                     <div class="hidden md:block ml-0 text-xs text-gray-500 uppercase tracking-wide">
                         Пакеты с логотипом
