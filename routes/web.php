@@ -14,13 +14,6 @@ Route::get('/', [SiteController::class, 'index'])->name('home');
 
 Route::get('test', [SiteController::class, 'index'])->name('test');
 
-//Route::get('dashboard', function () {
-//    return Inertia::render('Dashboard');
-//})->middleware(['auth', 'verified'])->name('dashboard');
-
-//Route::group(['prefix' => 'laravel-filemanager', 'middleware' => ['web', 'auth']], function () {
-//    Lfm::routes();
-//});
 Route::group([
   'prefix' => 'laravel-filemanager',
   'middleware' => ['moonshine', 'auth']  // 'auth' с guard 'moonshine' из config/moonshine.php
