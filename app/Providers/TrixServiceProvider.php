@@ -15,7 +15,7 @@ final class TrixServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        $this->loadViewsFrom('../resources/views/fields/trix','porcelanosa-trix');
+        $this->loadViewsFrom(resource_path('views/fields/trix'),'porcelanosa-trix');
 
 
         $this->publishes([

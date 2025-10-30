@@ -15,7 +15,7 @@ final class TinyMCEServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        $this->loadViewsFrom('../resources/views/fields/tinymce','porcelanosa-tinymce');
+        $this->loadViewsFrom(resource_path('views/fields/tinymce'),'porcelanosa-tinymce');
 
 
         $this->publishes([
