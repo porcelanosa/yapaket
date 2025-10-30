@@ -92,6 +92,8 @@ jobs:
             --exclude='.editorconfig' \
             --exclude='yapaket.local.key.pem' \
             --exclude='yapaket.local.pem' \
+            --exclude='design' \
+            --exclude='docs' \
             --exclude='public' \
             .
           

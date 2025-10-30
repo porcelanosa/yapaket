@@ -1,10 +1,10 @@
 {{-- resources/views/components/header.blade.php --}}
 @props(['mainNav'=>[]])
 
-<header class="bg-white shadow-md">
+<subheader class="bg-white border-0">
     <div class="container mx-auto flex justify-between items-center py-4 px-4">
         <a href="{{ url('/') }}" class="text-2xl font-bold text-red-600">
-            Polygraphy Portal
+            Производство брендированных пакетов.
         </a>
 
         <nav class="hidden md:flex space-x-6">
@@ -16,19 +16,21 @@
             @endforeach
         </nav>
     </div>
-</header>
+</subheader>
 <!-- Header -->
 <header class="bg-white shadow-sm sticky top-0 z-30">
     <div class="container mx-auto px-4">
         <!-- Top row with logo, search, and contact -->
         <div class="flex items-center justify-between py-3">
             <div class="flex items-start flex-col">
-                <div class="text-2xl font-bold">
-                    <span class="text-black">Ya</span><span class="bg-red-600 text-white px-1 rounded">Paket</span>
-                </div>
-                <div class="hidden md:block ml-0 text-xs text-gray-500 uppercase tracking-wide">
-                    Пакеты с логотипом
-                </div>
+                <a href="/" title="на главную страницу пакетов с логотипом" class="no-underline">
+                    <div class="text-2xl font-bold">
+                        <span class="text-black">Ya</span><span class="bg-red-600 text-white px-1 rounded">Paket</span>
+                    </div>
+                    <div class="hidden md:block ml-0 text-xs text-gray-500 uppercase tracking-wide">
+                        Пакеты с логотипом
+                    </div>
+                </a>
             </div>
             <!-- Search bar (desktop) -->
             <div class="hidden md:flex flex-1 max-w-md mx-8">
