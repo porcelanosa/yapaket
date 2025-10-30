@@ -4,9 +4,11 @@ declare(strict_types = 1);
 
 namespace App\Providers;
 
+use App\MoonShine\Pages\SettingsPage;
 use App\MoonShine\Resources\AttributeResource;
 use App\MoonShine\Resources\CategoryResource;
 use App\MoonShine\Resources\ImageResource;
+use App\MoonShine\Resources\MenuItemResource;
 use App\MoonShine\Resources\MenuResource;
 use App\MoonShine\Resources\MoonShineUserResource;
 use App\MoonShine\Resources\MoonShineUserRoleResource;
@@ -15,13 +17,11 @@ use App\MoonShine\Resources\PostResource;
 use App\MoonShine\Resources\ProductAttributeResource;
 use App\MoonShine\Resources\ProductImageResource;
 use App\MoonShine\Resources\ProductResource;
-use App\MoonShine\Pages\SettingsPage;
 use Illuminate\Support\ServiceProvider;
 use MoonShine\Contracts\Core\DependencyInjection\ConfiguratorContract;
 use MoonShine\Contracts\Core\DependencyInjection\CoreContract;
 use MoonShine\Laravel\DependencyInjection\MoonShine;
 use MoonShine\Laravel\DependencyInjection\MoonShineConfigurator;
-use App\MoonShine\Resources\MenuItemResource;
 
 class MoonShineServiceProvider extends ServiceProvider
 {
@@ -45,8 +45,8 @@ class MoonShineServiceProvider extends ServiceProvider
             CategoryResource::class,
             PostResource::class,
             MenuResource::class,
-              MenuItemResource::class,
-            ])
+            MenuItemResource::class
+          ])
           ->pages([
             ...$config->getPages(),
             SettingsPage::class,

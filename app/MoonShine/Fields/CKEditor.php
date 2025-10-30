@@ -413,7 +413,7 @@ final class CKEditor extends Textarea
      * Быстрая настройка Laravel File Manager
      * Включает браузер и загрузку изображений через LFM
      */
-    public function withFileManager(string $prefix = '/laravel-filemanager'): self
+    public function withFileManager(string $prefix = '/filemanager'): self
     {
         $this->config['lfmConfig'] = [
           'prefix' => $prefix,
@@ -429,7 +429,7 @@ final class CKEditor extends Textarea
     public function fileManagerType(string $type): self
     {
         if (!isset($this->config['lfmConfig'])) {
-            $this->config['lfmConfig'] = ['prefix' => '/laravel-filemanager'];
+            $this->config['lfmConfig'] = ['prefix' => '/filemanager'];
         }
         $this->config['lfmConfig']['type'] = $type;
 

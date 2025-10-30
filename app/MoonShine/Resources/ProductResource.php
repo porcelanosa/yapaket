@@ -103,7 +103,7 @@ class ProductResource extends ModelResource
               [
                 Box::make([
                   ID::make()->disabled(),
-                  Text::make('Name', 'name')->reactive()->required(),
+                  Text::make('Название', 'name')->reactive()->required(),
                   Text::make('Заголовок браузера', 'title')->required(),
                   Slug::make('ЧПУ (URL)', 'slug')->from('name')->unique()->live(),
                   Text::make('Meta Description', 'meta_description')
