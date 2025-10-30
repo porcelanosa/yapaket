@@ -19,9 +19,9 @@ class SiteSettingsService
     public function getMainNav(): array
     {
         return [
-          ['title' => 'Контакты', 'url' => route('test')],
-          ['title' => 'Оплата', 'url' => route('test')],
-          ['title' => 'Доставка', 'url' => route('test')],
+          ['title' => 'Контакты', 'url' => route('home')],
+          ['title' => 'Оплата', 'url' => route('home')],
+          ['title' => 'Доставка', 'url' => route('home')],
         ];
     }
 
