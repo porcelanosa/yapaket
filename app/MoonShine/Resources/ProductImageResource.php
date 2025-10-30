@@ -25,7 +25,7 @@ class ProductImageResource extends ModelResource
 
     protected string $column = 'title';
 
-    protected array $with = ['product'];
+//    protected array $with = ['product'];
     // Отключаем отображение в меню
     public bool $withPolicy = false;
 

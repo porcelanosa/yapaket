@@ -21,11 +21,13 @@ use MoonShine\Laravel\Resources\ModelResource;
 use MoonShine\UI\Components\ActionButton;
 use MoonShine\UI\Components\Badge;
 use MoonShine\UI\Components\Collapse;
+use MoonShine\UI\Components\Heading;
 use MoonShine\UI\Components\Layout\Box;
 use MoonShine\UI\Components\Layout\Column;
 use MoonShine\UI\Components\Layout\Flex;
 use MoonShine\UI\Components\Layout\Grid;
 use MoonShine\UI\Fields\ID;
+use MoonShine\UI\Fields\Switcher;
 use MoonShine\UI\Fields\Text;
 use MoonShine\UI\Fields\Textarea;
 
@@ -103,11 +105,27 @@ class ProductResource extends ModelResource
               [
                 Box::make([
                   ID::make()->disabled(),
-                  Text::make('Название', 'name')->reactive()->required(),
-                  Text::make('Заголовок браузера', 'title')->required(),
-                  Slug::make('ЧПУ (URL)', 'slug')->from('name')->unique()->live(),
-                  Text::make('Meta Description', 'meta_description')
-                      ->extension(new CharCount()),
+
+                  Flex::make([
+                    Text::make('Название', 'name')->reactive()->required(),
+                    Switcher::make('На сайте', 'status'),
+                    Switcher::make('На главной', 'is_hit'),
+                  ])
+                      ->name('flex-titles')
+                      ->justifyAlign('between')
+                      ->itemsAlign('stretch'),
+                  Collapse::make('ЧПУ и SEO', [
+//                    Heading::make(),
+                    Flex::make([
+                      Text::make('Заголовок браузера', 'title')->required(),
+                      Slug::make('ЧПУ (URL)', 'slug')->from('name')->unique()->live(),
+                      Text::make('Meta Description', 'meta_description')
+                          ->extension(new CharCount()),
+                    ])
+//                        ->name('flex-titles')
+                        ->justifyAlign('between')
+                        ->itemsAlign('end'),
+                  ]),
 
                   Collapse::make('Цена и тираж:', [
 //                    Heading::make('Цена и тираж:'),
@@ -204,10 +222,10 @@ class ProductResource extends ModelResource
 //          ]),
           HasMany::make('Изображения', 'productImages', resource: ProductImageResource::class)
 //                 ->searchable(false)
-                 ->async()
+//                 ->async()
                  ->modifyItemButtons(
-              fn(ActionButton $detail, $edit, $delete, $massDelete, HasMany $ctx) => [$edit, $delete],
-            )
+                   fn(ActionButton $detail, $edit, $delete, $massDelete, HasMany $ctx) => [$edit, $delete],
+                 )
                  ->modifyCreateButton(
                    fn(ActionButton $button) => $button->setLabel('Добавить изображение в галерею'),
                  )
