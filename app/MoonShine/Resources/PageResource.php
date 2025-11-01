@@ -16,8 +16,8 @@ use MoonShine\UI\Fields\Number;
 use MoonShine\UI\Fields\Switcher;
 use MoonShine\UI\Fields\Text;
 use MoonShine\UI\Fields\Textarea;
-//use VI\MoonShineSpatieMediaLibrary\Fields\MediaLibrary;
 use App\MoonShine\Fields\MediaLibrary;
+use App\MoonShine\Fields\CKEditor;
 
 class PageResource extends ModelResource
 {
@@ -41,7 +41,7 @@ class PageResource extends ModelResource
           MediaLibrary::make('Изображение', 'page_image'),
           Text::make('Название', 'name')->sortable(),
           Text::make('Заголовок', 'title')->sortable(),
-          // Убрано поле products, чтобы избежать циклической загрузки
+          Switcher::make('На главной', 'show_in_main')->updateOnPreview(),
           Switcher::make('Активна', 'active')->updateOnPreview(),
             Number::make('Порядок', 'sort')
               ->buttons()
@@ -62,11 +62,15 @@ class PageResource extends ModelResource
               ->separator('-')
               ->required(),
           Textarea::make('Meta description', 'meta_description'),
-          Textarea::make('Краткое описание', 'short_description'),
-          Textarea::make('Описание', 'description'),
+          Textarea::make('Анонс', 'short_description'),
+
+          CKEditor::make('Содержимое страницы', 'description')
+                  ->withFileManager()
+                  ->placeholderText('Содержимое страницы ...'),
 
           Number::make('Сортировка', 'sort')->default(0),
           Switcher::make('Активна', 'active')->default(true),
+          Switcher::make('На главной', 'show_in_main')->default(false),
           MediaLibrary::make('Изображение', 'page_image')
               ->removable(),
 //          BelongsToMany::make('Продукты', 'products', resource: ProductResource::class),

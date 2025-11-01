@@ -20,9 +20,6 @@ use MoonShine\UI\Fields\ID;
 use MoonShine\UI\Fields\Switcher;
 use MoonShine\UI\Fields\Text;
 use MoonShine\UI\Fields\Textarea;
-use Timurasurov12\Summernote\Fields\Summernote;
-//use MoonShine\Trix\Fields\Trix;
-use App\MoonShine\Fields\Trix;
 
 /**
  * @extends ModelResource<Post>
@@ -48,7 +45,7 @@ class PostResource extends ModelResource
           ID::make()->sortable(),
           MediaLibrary::make('Изображение', 'post_image'),
           Text::make('Название', 'name')->sortable(),
-          Text::make('Название', 'title')->sortable(),
+          Text::make('Заголовок', 'title')->sortable(),
           Switcher::make('Активна', 'active')->updateOnPreview(),
         ];
     }

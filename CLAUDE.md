@@ -9,15 +9,12 @@ The Laravel Boost guidelines are specifically curated by Laravel maintainers for
 This application is a Laravel application and its main Laravel ecosystems package & versions are below. You are an expert with them all. Ensure you abide by these specific packages & versions.
 
 - php - 8.4.11
-- inertiajs/inertia-laravel (INERTIA) - v2
 - laravel/framework (LARAVEL) - v12
 - laravel/prompts (PROMPTS) - v0
 - tightenco/ziggy (ZIGGY) - v2
 - laravel/pint (PINT) - v1
 - pestphp/pest (PEST) - v4
-- @inertiajs/vue3 (INERTIA) - v2
 - tailwindcss (TAILWINDCSS) - v4
-- vue (VUE) - v3
 
 
 ## Conventions
@@ -126,24 +123,6 @@ Route::get('/users', function () {
     ]);
 });
 </code-snippet>
-
-
-=== inertia-laravel/v2 rules ===
-
-## Inertia v2
-
-- Make use of all Inertia features from v1 & v2. Check the documentation before making any changes to ensure we are taking the correct approach.
-
-### Inertia v2 New Features
-- Polling
-- Prefetching
-- Deferred props
-- Infinite scrolling using merging props and `WhenVisible`
-- Lazy loading data on scroll
-
-### Deferred Props & Empty States
-- When using deferred props on the frontend, you should add a nice empty state with pulsing / animated skeleton.
-
 
 === laravel/core rules ===
 

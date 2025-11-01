@@ -22,6 +22,7 @@ class Page extends Model implements HasMedia
       'short_description',
       'description',
       'sort',
+      'show_in_main',
       'active',
     ];
     protected $casts    = [
