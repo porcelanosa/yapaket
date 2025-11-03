@@ -61,7 +61,8 @@ export default defineConfig({
             pattern: 'resources/svg/**/*.svg',
             filename: 'sprite.svg',
             prefix: 'icon',
-            svgo: {plugins: [
+            svgo: {
+                plugins: [
                     {
                         name: 'preset-default',
                         params: {
@@ -70,8 +71,9 @@ export default defineConfig({
                             },
                         },
                     },
-                ],},
-            emit:true
+                ],
+            },
+            emit: true,
         }),
         // createSvgIconsPlugin({
         //     // Путь к SVG-иконкам
