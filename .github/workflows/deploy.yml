@@ -131,304 +131,291 @@ jobs:
       # ============================================
       - name: 🎯 Deploy application on server
         run: |
-          set -e
-
-          echo "================================================"
-          echo "🚀 Starting deployment to yapaket.ru"
-          echo "================================================"
-
-          # Переменные
-          APP_PATH="/home/youprint/yapaket.ru"
-          DOCS_PATH="/home/youprint/yapaket.ru/docs"
-          TIMESTAMP=$(date +%Y%m%d-%H%M%S)
-          BACKUP_DIR="${APP_PATH}/backups"
-
-          # Создаем директории
-          mkdir -p ${BACKUP_DIR}
-          mkdir -p ${DOCS_PATH}
-
-          # ============================================
-          # BACKUP CURRENT VERSION
-          # ============================================
-          echo ""
-          echo "📦 Creating backup of current version..."
-          if [ -f "${APP_PATH}/composer.json" ]; then
-            cd ${APP_PATH}
-            tar -czf ${BACKUP_DIR}/backup-app-${TIMESTAMP}.tar.gz \
-              --exclude='storage/logs/*' \
-              --exclude='storage/framework/cache/*' \
-              --exclude='storage/framework/sessions/*' \
-              --exclude='storage/framework/views/*' \
-              --exclude='vendor' \
-              --exclude='node_modules' \
-              --exclude='docs' \
-              --exclude='backups' \
-              . 2>/dev/null || echo "⚠️  App backup skipped"
-
-            if [ -d "${DOCS_PATH}" ] && [ "$(ls -A ${DOCS_PATH})" ]; then
-              cd ${DOCS_PATH}
-              tar -czf ${BACKUP_DIR}/backup-docs-${TIMESTAMP}.tar.gz . 2>/dev/null || echo "⚠️  Docs backup skipped"
-            fi
-
-            echo "✅ Backups created"
-
-            # Удаляем старые бэкапы (оставляем последние 5 комплектов = 10 файлов)
-            cd ${BACKUP_DIR}
-            ls -t backup-*.tar.gz | tail -n +11 | xargs -r rm
-            echo "✅ Old backups cleaned"
-          else
-            echo "⚠️  No existing installation found, skipping backup"
-          fi
-
-          # ============================================
-          # SAVE IMPORTANT FILES
-          # ============================================
-          echo ""
-          echo "💾 Saving important files..."
-
-          # Сохраняем .env
-          if [ -f "${APP_PATH}/.env" ]; then
-            cp ${APP_PATH}/.env /tmp/.env.backup
-            echo "✅ .env backed up"
-          fi
-
-          # Сохраняем storage
-          if [ -d "${APP_PATH}/storage" ]; then
-            mkdir -p /tmp/storage-backup
-            if [ -d "${APP_PATH}/storage/app" ]; then
-              cp -r ${APP_PATH}/storage/app /tmp/storage-backup/ 2>/dev/null || true
-              echo "✅ storage/app backed up"
-            fi
-            if [ -d "${APP_PATH}/storage/logs" ]; then
-              cp -r ${APP_PATH}/storage/logs /tmp/storage-backup/ 2>/dev/null || true
-              echo "✅ storage/logs backed up"
-            fi
-          fi
-
-          # ============================================
-          # EXTRACT APPLICATION FILES
-          # ============================================
-          echo ""
-          echo "📂 Extracting application files..."
-          cd ${APP_PATH}
-          tar -xzf /tmp/yapaket-app.tar.gz
-          rm /tmp/yapaket-app.tar.gz
-          echo "✅ Application extracted to ${APP_PATH}"
-
-          # ============================================
-          # EXTRACT PUBLIC FILES TO DOCS
-          # ============================================
-          echo ""
-          echo "📂 Extracting public files to docs..."
-
-          # Очищаем docs, но сохраняем .htaccess если он есть
-          if [ -f "${DOCS_PATH}/.htaccess" ]; then
-            cp ${DOCS_PATH}/.htaccess /tmp/.htaccess.backup
-          fi
-
-          cd ${DOCS_PATH}
-          rm -rf *
-
-          # Распаковываем public в docs
-          tar -xzf /tmp/yapaket-public.tar.gz --strip-components=1
-          rm /tmp/yapaket-public.tar.gz
-
-          # Восстанавливаем .htaccess если был
-          if [ -f "/tmp/.htaccess.backup" ]; then
-            mv /tmp/.htaccess.backup ${DOCS_PATH}/.htaccess
-            echo "✅ .htaccess restored"
-          fi
-
-          echo "✅ Public files extracted to ${DOCS_PATH}"
-
-          # ============================================
-          # RESTORE IMPORTANT FILES
-          # ============================================
-          echo ""
-          echo "♻️  Restoring important files..."
-
-          # Восстанавливаем .env
-          if [ -f "/tmp/.env.backup" ]; then
-            mv /tmp/.env.backup ${APP_PATH}/.env
-            echo "✅ .env restored"
-          fi
-
-          # Восстанавливаем storage/app
-          if [ -d "/tmp/storage-backup/app" ]; then
-            mkdir -p ${APP_PATH}/storage/app
-            cp -r /tmp/storage-backup/app/* ${APP_PATH}/storage/app/ 2>/dev/null || true
-            echo "✅ storage/app restored"
-          fi
-
-          # Восстанавливаем storage/logs
-          if [ -d "/tmp/storage-backup/logs" ]; then
-            mkdir -p ${APP_PATH}/storage/logs
-            cp -r /tmp/storage-backup/logs/* ${APP_PATH}/storage/logs/ 2>/dev/null || true
-            echo "✅ storage/logs restored"
-          fi
-
-          # Удаляем временные файлы
-          rm -rf /tmp/storage-backup
-
-          # ============================================
-          # CONFIGURE ENVIRONMENT
-          # ============================================
-          echo ""
-          echo "🔧 Configuring environment..."
-          cd ${APP_PATH}
-
-          # Устанавливаем production environment
-          if [ -f ".env" ]; then
-            # Проверяем и устанавливаем APP_ENV=production
-            if grep -q "^APP_ENV=" .env; then
-              sed -i 's/^APP_ENV=.*/APP_ENV=production/' .env
-            else
-              echo "APP_ENV=production" >> .env
-            fi
-            echo "✅ APP_ENV=production set"
-
-            # Добавляем PUBLIC_PATH для явности
-            if ! grep -q "^PUBLIC_PATH=" .env; then
-              echo "PUBLIC_PATH=docs" >> .env
-              echo "✅ PUBLIC_PATH=docs added to .env"
-            fi
-
-            # ВАЖНО: Удаляем DATABASE_URL если есть (чтобы использовались отдельные DB_ переменные)
-            sed -i '/^DATABASE_URL=/d' .env
-            echo "✅ DATABASE_URL removed (using separate DB_ variables)"
-
-            # Показываем текущие настройки БД
+          ssh -o HostKeyAlgorithms=+ssh-rsa -p ${{ secrets.SSH_PORT }} -i ~/.ssh/deploy_key ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} << 'ENDSSH'
+            set -e
+          
+            echo "================================================"
+            echo "🚀 Starting deployment to yapaket.ru"
+            echo "================================================"
+          
+            # Переменные
+            APP_PATH="/home/youprint/yapaket.ru"
+            DOCS_PATH="/home/youprint/yapaket.ru/docs"
+            TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+            BACKUP_DIR="${APP_PATH}/backups"
+          
+            # Создаем директории
+            mkdir -p ${BACKUP_DIR}
+            mkdir -p ${DOCS_PATH}
+          
+            # ============================================
+            # BACKUP CURRENT VERSION
+            # ============================================
             echo ""
-            echo "Current database settings:"
-            grep "^DB_" .env || echo "No DB_ variables found!"
-          fi
-
-          # ============================================
-          # CREATE STORAGE SYMLINK
-          # ============================================
-          echo ""
-          echo "🔗 Creating storage symlink..."
-
-          # Удаляем старый симлинк если есть
-          if [ -L "${DOCS_PATH}/storage" ]; then
-            rm ${DOCS_PATH}/storage
-          fi
-
-          # Создаем новый симлинк
-          ln -s ${APP_PATH}/storage/app/public ${DOCS_PATH}/storage
-          echo "✅ Storage symlink created: ${DOCS_PATH}/storage -> ${APP_PATH}/storage/app/public"
-
-          # ============================================
-          # SET PERMISSIONS
-          # ============================================
-          echo ""
-          echo "🔒 Setting permissions..."
-          cd ${APP_PATH}
-
-          # Создаем необходимые директории в storage
-          mkdir -p storage/framework/cache/data
-          mkdir -p storage/framework/sessions
-          mkdir -p storage/framework/views
-          mkdir -p storage/logs
-          mkdir -p storage/app/public
-          mkdir -p bootstrap/cache
-
-          # Устанавливаем права
-          chmod -R 755 storage bootstrap/cache docs
-          chmod -R 775 storage/framework
-          chmod -R 775 storage/logs
-          chmod -R 775 storage/app/public
-
-          echo "✅ Permissions set"
-
-          # ============================================
-          # RUN LARAVEL COMMANDS
-          # ============================================
-          echo ""
-          echo "⚙️  Running Laravel commands..."
-          cd ${APP_PATH}
-
-          # КРИТИЧНО: Полная очистка всех кешей и скомпилированных файлов
-          echo "Clearing all caches and compiled files..."
-          php artisan cache:clear 2>/dev/null || true
-          php artisan config:clear 2>/dev/null || true
-          php artisan route:clear 2>/dev/null || true
-          php artisan view:clear 2>/dev/null || true
-
-          # Удаляем скомпилированные файлы вручную
-          rm -f bootstrap/cache/config.php
-          rm -f bootstrap/cache/routes-v7.php
-          rm -f bootstrap/cache/packages.php
-          rm -f bootstrap/cache/services.php
-          echo "✅ All caches and compiled files cleared"
-
-          # Проверяем подключение к БД
-          echo ""
-          echo "Testing database connection..."
-          php artisan db:show 2>/dev/null || echo "⚠️  Could not show database info"
-
-          # Запускаем миграции
-          echo ""
-          echo "Running migrations..."
-          php artisan migrate --force
-          echo "✅ Migrations completed"
-
-          # Создаем новый кеш
-          echo ""
-          echo "Building optimized cache..."
-          php artisan config:cache
-          php artisan route:cache
-          php artisan view:cache
-          echo "✅ Cache optimized"
-
-          # Оптимизация autoloader
-          echo ""
-          echo "Optimizing autoloader..."
-          php vendor/bin/composer dump-autoload --optimize --no-dev --quiet 2>/dev/null || composer dump-autoload --optimize --no-dev --quiet 2>/dev/null || true
-          echo "✅ Autoloader optimized"
-
-          # ============================================
-          # RELOAD PHP-FPM
-          # ============================================
-          # echo ""
-          # echo "🔄 Reloading PHP-FPM..."
-          # if command -v systemctl &> /dev/null; then
-          #   if sudo -n systemctl reload php8.4-fpm 2>/dev/null; then
-          #     echo "✅ PHP-FPM reloaded"
-          #   else
-          #     echo "⚠️  PHP-FPM reload skipped (no sudo access)"
-          #   fi
-          # else
-          #     echo "⚠️  systemctl not available, skipping PHP-FPM reload"
-          # fi
-
-          # ============================================
-          # CLEANUP
-          # ============================================
-          echo ""
-          echo "🧹 Cleaning up..."
-          cd ${APP_PATH}
-
-          # Удаляем ненужные файлы
-          rm -rf tests
-          rm -f phpunit.xml
-
-          echo "✅ Cleanup completed"
-
-          # ============================================
-          # DEPLOYMENT SUMMARY
-          # ============================================
-          echo ""
-          echo "================================================"
-          echo "✅ Deployment completed successfully!"
-          echo "================================================"
-          echo ""
-          echo "📊 Deployment info:"
-          echo "  - Timestamp: ${TIMESTAMP}"
-          echo "  - App path: ${APP_PATH}"
-          echo "  - Docs path: ${DOCS_PATH}"
-          echo "  - Environment: production"
-          echo "  - Backup: ${BACKUP_DIR}/backup-*-${TIMESTAMP}.tar.gz"
-          echo ""
-          echo "🌐 Website: https://yapaket.ru"
-          echo ""
+            echo "📦 Creating backup of current version..."
+            if [ -f "${APP_PATH}/composer.json" ]; then
+              cd ${APP_PATH}
+              tar -czf ${BACKUP_DIR}/backup-app-${TIMESTAMP}.tar.gz \
+                --exclude='storage/logs/*' \
+                --exclude='storage/framework/cache/*' \
+                --exclude='storage/framework/sessions/*' \
+                --exclude='storage/framework/views/*' \
+                --exclude='vendor' \
+                --exclude='node_modules' \
+                --exclude='docs' \
+                --exclude='backups' \
+                . 2>/dev/null || echo "⚠️  App backup skipped"
+          
+              if [ -d "${DOCS_PATH}" ] && [ "$(ls -A ${DOCS_PATH})" ]; then
+                cd ${DOCS_PATH}
+                tar -czf ${BACKUP_DIR}/backup-docs-${TIMESTAMP}.tar.gz . 2>/dev/null || echo "⚠️  Docs backup skipped"
+              fi
+          
+              echo "✅ Backups created"
+          
+              # Удаляем старые бэкапы (оставляем последние 5 комплектов = 10 файлов)
+              cd ${BACKUP_DIR}
+              ls -t backup-*.tar.gz | tail -n +11 | xargs -r rm
+              echo "✅ Old backups cleaned"
+            else
+              echo "⚠️  No existing installation found, skipping backup"
+            fi
+          
+            # ============================================
+            # SAVE IMPORTANT FILES
+            # ============================================
+            echo ""
+            echo "💾 Saving important files..."
+          
+            # Сохраняем .env
+            if [ -f "${APP_PATH}/.env" ]; then
+              cp ${APP_PATH}/.env /tmp/.env.backup
+              echo "✅ .env backed up"
+            fi
+          
+            # Сохраняем storage
+            if [ -d "${APP_PATH}/storage" ]; then
+              mkdir -p /tmp/storage-backup
+              if [ -d "${APP_PATH}/storage/app" ]; then
+                cp -r ${APP_PATH}/storage/app /tmp/storage-backup/ 2>/dev/null || true
+                echo "✅ storage/app backed up"
+              fi
+              if [ -d "${APP_PATH}/storage/logs" ]; then
+                cp -r ${APP_PATH}/storage/logs /tmp/storage-backup/ 2>/dev/null || true
+                echo "✅ storage/logs backed up"
+              fi
+            fi
+          
+            # ============================================
+            # EXTRACT APPLICATION FILES
+            # ============================================
+            echo ""
+            echo "📂 Extracting application files..."
+            cd ${APP_PATH}
+            tar -xzf /tmp/yapaket-app.tar.gz
+            rm /tmp/yapaket-app.tar.gz
+            echo "✅ Application extracted to ${APP_PATH}"
+          
+            # ============================================
+            # EXTRACT PUBLIC FILES TO DOCS
+            # ============================================
+            echo ""
+            echo "📂 Extracting public files to docs..."
+          
+            # Очищаем docs, но сохраняем .htaccess если он есть
+            if [ -f "${DOCS_PATH}/.htaccess" ]; then
+              cp ${DOCS_PATH}/.htaccess /tmp/.htaccess.backup
+            fi
+          
+            cd ${DOCS_PATH}
+            rm -rf *
+          
+            # Распаковываем public в docs
+            tar -xzf /tmp/yapaket-public.tar.gz --strip-components=1
+            rm /tmp/yapaket-public.tar.gz
+          
+            # Восстанавливаем .htaccess если был
+            if [ -f "/tmp/.htaccess.backup" ]; then
+              mv /tmp/.htaccess.backup ${DOCS_PATH}/.htaccess
+              echo "✅ .htaccess restored"
+            fi
+          
+            echo "✅ Public files extracted to ${DOCS_PATH}"
+          
+            # ============================================
+            # RESTORE IMPORTANT FILES
+            # ============================================
+            echo ""
+            echo "♻️  Restoring important files..."
+          
+            # Восстанавливаем .env
+            if [ -f "/tmp/.env.backup" ]; then
+              mv /tmp/.env.backup ${APP_PATH}/.env
+              echo "✅ .env restored"
+            fi
+          
+            # Восстанавливаем storage/app
+            if [ -d "/tmp/storage-backup/app" ]; then
+              mkdir -p ${APP_PATH}/storage/app
+              cp -r /tmp/storage-backup/app/* ${APP_PATH}/storage/app/ 2>/dev/null || true
+              echo "✅ storage/app restored"
+            fi
+          
+            # Восстанавливаем storage/logs
+            if [ -d "/tmp/storage-backup/logs" ]; then
+              mkdir -p ${APP_PATH}/storage/logs
+              cp -r /tmp/storage-backup/logs/* ${APP_PATH}/storage/logs/ 2>/dev/null || true
+              echo "✅ storage/logs restored"
+            fi
+          
+            # Удаляем временные файлы
+            rm -rf /tmp/storage-backup
+          
+            # ============================================
+            # CONFIGURE ENVIRONMENT
+            # ============================================
+            echo ""
+            echo "🔧 Configuring environment..."
+            cd ${APP_PATH}
+          
+            # Устанавливаем production environment
+            if [ -f ".env" ]; then
+              # Проверяем и устанавливаем APP_ENV=production
+              if grep -q "^APP_ENV=" .env; then
+                sed -i 's/^APP_ENV=.*/APP_ENV=production/' .env
+              else
+                echo "APP_ENV=production" >> .env
+              fi
+              echo "✅ APP_ENV=production set"
+          
+              # Добавляем PUBLIC_PATH для явности
+              if ! grep -q "^PUBLIC_PATH=" .env; then
+                echo "PUBLIC_PATH=docs" >> .env
+                echo "✅ PUBLIC_PATH=docs added to .env"
+              fi
+          
+              # ВАЖНО: Удаляем DATABASE_URL если есть (чтобы использовались отдельные DB_ переменные)
+              sed -i '/^DATABASE_URL=/d' .env
+              echo "✅ DATABASE_URL removed (using separate DB_ variables)"
+          
+              # Показываем текущие настройки БД
+              echo ""
+              echo "Current database settings:"
+              grep "^DB_" .env || echo "No DB_ variables found!"
+            fi
+          
+            # ============================================
+            # CREATE STORAGE SYMLINK
+            # ============================================
+            echo ""
+            echo "🔗 Creating storage symlink..."
+          
+            # Удаляем старый симлинк если есть
+            if [ -L "${DOCS_PATH}/storage" ]; then
+              rm ${DOCS_PATH}/storage
+            fi
+          
+            # Создаем новый симлинк
+            ln -s ${APP_PATH}/storage/app/public ${DOCS_PATH}/storage
+            echo "✅ Storage symlink created: ${DOCS_PATH}/storage -> ${APP_PATH}/storage/app/public"
+          
+            # ============================================
+            # SET PERMISSIONS
+            # ============================================
+            echo ""
+            echo "🔒 Setting permissions..."
+            cd ${APP_PATH}
+          
+            # Создаем необходимые директории в storage
+            mkdir -p storage/framework/cache/data
+            mkdir -p storage/framework/sessions
+            mkdir -p storage/framework/views
+            mkdir -p storage/logs
+            mkdir -p storage/app/public
+            mkdir -p bootstrap/cache
+          
+            # Устанавливаем права
+            chmod -R 755 storage bootstrap/cache docs
+            chmod -R 775 storage/framework
+            chmod -R 775 storage/logs
+            chmod -R 775 storage/app/public
+          
+            echo "✅ Permissions set"
+          
+            # ============================================
+            # RUN LARAVEL COMMANDS
+            # ============================================
+            echo ""
+            echo "⚙️  Running Laravel commands..."
+            cd ${APP_PATH}
+          
+            # КРИТИЧНО: Полная очистка всех кешей и скомпилированных файлов
+            echo "Clearing all caches and compiled files..."
+            php artisan cache:clear 2>/dev/null || true
+            php artisan config:clear 2>/dev/null || true
+            php artisan route:clear 2>/dev/null || true
+            php artisan view:clear 2>/dev/null || true
+          
+            # Удаляем скомпилированные файлы вручную
+            rm -f bootstrap/cache/config.php
+            rm -f bootstrap/cache/routes-v7.php
+            rm -f bootstrap/cache/packages.php
+            rm -f bootstrap/cache/services.php
+            echo "✅ All caches and compiled files cleared"
+          
+            # Проверяем подключение к БД
+            echo ""
+            echo "Testing database connection..."
+            php artisan db:show 2>/dev/null || echo "⚠️  Could not show database info"
+          
+            # Запускаем миграции
+            echo ""
+            echo "Running migrations..."
+            php artisan migrate --force
+            echo "✅ Migrations completed"
+          
+            # Создаем новый кеш
+            echo ""
+            echo "Building optimized cache..."
+            php artisan config:cache
+            php artisan route:cache
+            php artisan view:cache
+            echo "✅ Cache optimized"
+          
+            # Оптимизация autoloader
+            echo ""
+            echo "Optimizing autoloader..."
+            php vendor/bin/composer dump-autoload --optimize --no-dev --quiet 2>/dev/null || composer dump-autoload --optimize --no-dev --quiet 2>/dev/null || true
+            echo "✅ Autoloader optimized"
+          
+            # ============================================
+            # CLEANUP
+            # ============================================
+            echo ""
+            echo "🧹 Cleaning up..."
+            cd ${APP_PATH}
+          
+            # Удаляем ненужные файлы
+            rm -rf tests
+            rm -f phpunit.xml
+          
+            echo "✅ Cleanup completed"
+          
+            # ============================================
+            # DEPLOYMENT SUMMARY
+            # ============================================
+            echo ""
+            echo "================================================"
+            echo "✅ Deployment completed successfully!"
+            echo "================================================"
+            echo ""
+            echo "📊 Deployment info:"
+            echo "  - Timestamp: ${TIMESTAMP}"
+            echo "  - App path: ${APP_PATH}"
+            echo "  - Docs path: ${DOCS_PATH}"
+            echo "  - Environment: production"
+            echo "  - Backup: ${BACKUP_DIR}/backup-*-${TIMESTAMP}.tar.gz"
+            echo ""
+            echo "🌐 Website: https://yapaket.ru"
+            echo ""
+          ENDSSH
