@@ -7,12 +7,25 @@ body {
     @apply flex flex-col bg-gray-50;
 }
 
+.sidebar {
+    @apply bg-white shadow-md rounded-lg p-4 space-y-6 border border-gray-200;
+}
+
 .content {
     flex: 1 0 auto;
 }
 
+a.card-in-list {
+    @apply block no-underline
+    bg-white rounded-xl shadow-md hover:shadow-lg  border border-gray-200
+    transition-all duration-300 overflow-hidden flex flex-col h-full;
+}
+
 .footer {
     flex-shrink: 0;
+}
+.dark #icon-yapaket-logo ellipse {
+    stroke: white!important;
 }
 /* Принудительно отключаем dark mode */
 @media (prefers-color-scheme: dark) {

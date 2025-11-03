@@ -34,7 +34,7 @@ class ProductImagesController extends Controller
      * @param  int       $quality
      * @param  int       $imageId
      */
-    public function resize(int $imageId, int $width, ?int $height = null, string $type = 'webp', $quality = 80)
+    public function resize(int $imageId, int $width, ?int $height = null, string $type = 'webp', int $quality = 80)
     {
         // Валидация размеров
         if ($width < 1 || $width > 1920) {

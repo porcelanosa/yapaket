@@ -1,26 +1,19 @@
-{{-- resources/views/components/footer.blade.php --}}
-{{--<footer class="bg-white border-t mt-8">--}}
-{{--    <div class="container mx-auto text-center py-6 text-sm text-gray-600">--}}
-{{--        &copy; {{ date('Y') }} Polygraphy Portal. Все права защищены.--}}
-{{--    </div>--}}
-{{--</footer>--}}
-@props(['contacts'=>'contacts', 'services'=>'services'])
 <footer class="bg-gray-800 text-white mt-8">
     <div class="container mx-auto px-4 py-8">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <!-- Company info -->
             <div class="md:col-span-2">
                 <div class="text-2xl font-bold mb-4">
-                    <span class="text-white">Ya</span><span class="bg-red-600 text-white px-1 rounded">Paket</span>
+                    <x-svgicon name="yapaket-logo-light" class="w-32 h-16"/>
+                    {{--<span class="text-white">Ya</span><span class="bg-red-600 text-white px-1 rounded">Paket</span>--}}
                 </div>
                 <p class="text-gray-300 text-sm mb-4">
                     Профессиональная полиграфия и изготовление сувениров.
                     Высокое качество печати и индивидуальный подход к каждому заказу.
                 </p>
                 <div class="text-sm">
-                    <div class="mb-2">📍 {!! $contact['address'] ?? 'Адрес не указан' !!}</div>
-                    <div class="mb-2">📞 {!! $contact['phone'] ?? 'Телефон не указан'  !!} </div>
-                    <div>✉️ {!! $contact['email'] ?? 'Почта не указана' !!}</div>
+                    <div class="mb-2">{!! $siteAddress !!}</div>
+                    <div class="mb-2">{!! $sitePhone  !!} </div>
+                    <div>{!! $siteEmail !!}</div>
                 </div>
             </div>
             <!-- Services -->

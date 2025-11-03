@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\HasMenuItems;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -13,6 +14,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 /**
  * @extends Model
+ * @method static Builder|Page active()
  * @property \Illuminate\Database\Eloquent\Collection|\App\Models\ProductImage[] $productImages
  */
 class Product extends Model implements HasMedia
@@ -105,6 +107,24 @@ class Product extends Model implements HasMedia
         return $this->belongsToMany(Category::class, 'category_product', 'product_id', 'category_id');
     }
 
+    public function firstCategory(): BelongsToMany
+    {
+        return $this
+          ->belongsToMany(Category::class, 'category_product', 'product_id', 'category_id')
+          ->limit(1);
+    }
+
+    public function getPrimaryCategoryAttribute(): ?Category
+    {
+        // Если уже загружены категории — не делаем повторный запрос
+        if ($this->relationLoaded('categories')) {
+            return $this->categories->first();
+        }
+
+        // Иначе лениво загружаем первую категорию
+        return $this->categories()->first();
+    }
+
     /**
      * Связь многие-ко-многим со страницами
      */
@@ -136,11 +156,22 @@ class Product extends Model implements HasMedia
         );
     }
 
+    public function scopeActive($query): Builder|self
+    {
+        return $query->where('status', true);
+    }
+
     /**
      * Get the url for the product.
      */
     public function getUrlAttribute(): string
     {
-        return route('products.show', $this->slug);
+        $categorySlug = $this->primaryCategory?->slug;
+
+        return route('products.show', [
+          'category' => $categorySlug,
+          'product'  => $this->slug,
+        ]);
     }
+
 }

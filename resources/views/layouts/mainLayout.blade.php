@@ -20,15 +20,15 @@
 
 <div class="container mx-auto flex py-6 px-4">
 
-    <x-left-sidebar class="hidden lg:block w-64 mr-6" />
+    <x-left-sidebar class="hidden lg:block w-64 mr-0" />
 
     <main class="flex-1">
         <x-breadcrumbs :breadcrumbs="$breadcrumbs ?? collect()" class="mb-6" />
-
+        <x-top-content-pages-menu/>
         @yield('content')
     </main>
 
-    <x-right-sidebar class="hidden xl:block w-64 ml-6" />
+    <x-right-sidebar class="hidden xl:block w-64" />
 
 </div>
 <x-footer />

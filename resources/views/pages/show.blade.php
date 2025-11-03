@@ -51,6 +51,9 @@
         </div>
     </section>
     <section>
+        @isset($component)
+            <x-dynamic-component :component="$component" :page="$page"/>
+        @endisset
         {!! $page->content !!}
     </section>
 @endsection

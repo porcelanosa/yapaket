@@ -3,7 +3,7 @@
 
 <subheader class="sticky top-0 z-30 bg-white border-0">
     <div class="container mx-auto flex justify-between items-center py-4 px-4">
-        <a href="{{ url('/') }}" class="text-2xl font-bold text-red-600">
+        <a href="{{ route('home') }}" class="text-2xl font-bold text-red-600">
             Производство брендированных пакетов.
         </a>
 
@@ -26,7 +26,6 @@
 
                     <div class="text-2xl font-bold">
                         <x-svgicon name="yapaket-logo" class="w-32 h-16 "/>
-                        {{--<span class="text-black">Ya</span><span class="bg-red-600 text-white px-1 rounded">Paket</span>--}}
                     </div>
                     <div class="hidden md:block ml-0 text-xs text-gray-500 uppercase tracking-wide">
                         Пакеты с логотипом
@@ -34,17 +33,16 @@
                 </a>
             </div>
             <!-- Search bar (desktop) -->
-            <div class="hidden md:flex flex-1 max-w-md mx-8">
-                <div class="relative w-full">
-                    <input type="text" placeholder="Искать на сайте"
-                           class="w-full border-2 border-dashed border-gray-400 px-3 py-2 text-sm">
-                </div>
-            </div>
+            <x-search-form class="hidden md:flex flex-1 max-w-md mx-8" />
+
             <!-- Contact info and mobile menu -->
             <div class="flex items-center justify-between space-x-4">
                 <div class="hidden md:block text-right">
-                    <div class="text-lg font-bold">+7 926 842 66 36</div>
-                    <div class="text-sm text-gray-600 underline">24@youprint.ru</div>
+                    <a class="text-lg text-gray-800 hover:text-gray-700 no-underline font-bold block" href="tel:{{ preg_replace('/[^0-9]/', '', $purePhone) }}">{{ $purePhone }}</a>
+                    <a class="text-sm text-gray-600 underline hover:no-underline" href="mailto:{{ preg_replace('/[^\w\.\@]/u', '', $siteEmail) }}">
+                        {{ $siteEmail }}
+                    </a>
+
                 </div>
                 <x-yp.yp-button color="red">Задать вопрос&nbsp;
                     <x-fas-question-circle class="w-6 h-6 " />
@@ -58,10 +56,8 @@
             </div>
         </div>
         <!-- Mobile search -->
-        <div class="md:hidden pb-3">
-            <input type="text" placeholder="Искать на сайте"
-                   class="w-full border-2 border-dashed border-gray-400 px-3 py-2 text-sm">
-        </div>
+        <x-search-form class="md:hidden pb-3" />
+
     </div>
 </header>
 <!-- Mobile menu overlay -->

@@ -3,11 +3,15 @@
 namespace App\Models;
 
 use App\Models\Concerns\HasMenuItems;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
+/**
+ * @method static Builder|Page active()
+ */
 class Post extends Model implements HasMedia
 {
     use InteractsWithMedia/*, HasMenuItems*/;

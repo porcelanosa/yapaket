@@ -2,16 +2,24 @@
 
 namespace App\Models;
 
-use App\Models\Concerns\HasMenuItems;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Facades\Cache;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
+/**
+ * @method static Builder|Page inMain()
+ * @method static Builder|Page active()
+ * @property string|null $component
+ * @property string|null $slug
+ */
 class Page extends Model implements HasMedia
 {
-    use InteractsWithMedia/*, HasMenuItems*/;
+    use InteractsWithMedia/*, HasMenuItems*/
+        ;
 
 //    protected $with     = ['products'];
     protected $fillable = [
@@ -21,6 +29,7 @@ class Page extends Model implements HasMedia
       'meta_description',
       'short_description',
       'description',
+      'component',
       'sort',
       'show_in_main',
       'active',
@@ -43,8 +52,7 @@ class Page extends Model implements HasMedia
 //          ->sharpen(10)
           ->format('webp')
           ->optimize()
-          ->nonQueued()
-        ;
+          ->nonQueued();
         $this
           ->addMediaConversion('original_page_webp')
           ->format('webp')
@@ -78,9 +86,35 @@ class Page extends Model implements HasMedia
         return route('pages.show', $this->slug);
     }
 
+    public function getComponentAttribute(): ?string
+    {
+        return $this->attributes['component'] ?: null;
+    }
 
-    public function scopeActive($query)
+    public function scopeActive($query): Builder|self
     {
         return $query->where('active', true);
+    }
+
+    public function scopeInMain($query): Builder|self
+    {
+        return $query->where('active', true)->where('show_in_main', true)->orderBy('sort');
+    }
+
+    protected static function booted(): void
+    {
+        static::saved(function () {
+            self::clearCache();
+        });
+
+        static::deleted(function () {
+            self::clearCache();
+        });
+    }
+
+    public static function clearCache(): void
+    {
+//        static::$runtimeCache = [];
+        Cache::store('file')->forget('home_pages');
     }
 }

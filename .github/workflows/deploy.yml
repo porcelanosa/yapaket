@@ -383,25 +383,30 @@ jobs:
             echo "✅ Cache optimized"
           
             # Оптимизация autoloader
+#            echo ""
+#            echo "Optimizing autoloader..."
+#            composer dump-autoload --optimize --no-dev --quiet
+#            echo "✅ Autoloader optimized"
+
             echo ""
             echo "Optimizing autoloader..."
-            composer dump-autoload --optimize --no-dev --quiet
+            php vendor/bin/composer dump-autoload --optimize --no-dev --quiet 2>/dev/null || composer dump-autoload --optimize --no-dev --quiet 2>/dev/null || true
             echo "✅ Autoloader optimized"
           
             # ============================================
             # RELOAD PHP-FPM
             # ============================================
-            echo ""
-            echo "🔄 Reloading PHP-FPM..."
-            if command -v systemctl &> /dev/null; then
-              if sudo -n systemctl reload php8.4-fpm 2>/dev/null; then
-                echo "✅ PHP-FPM reloaded"
-              else
-                echo "⚠️  PHP-FPM reload skipped (no sudo access)"
-              fi
-            else
-              echo "⚠️  systemctl not available, skipping PHP-FPM reload"
-            fi
+#            echo ""
+#            echo "🔄 Reloading PHP-FPM..."
+#            if command -v systemctl &> /dev/null; then
+#              if sudo -n systemctl reload php8.4-fpm 2>/dev/null; then
+#                echo "✅ PHP-FPM reloaded"
+#              else
+#                echo "⚠️  PHP-FPM reload skipped (no sudo access)"
+#              fi
+#            else
+#              echo "⚠️  systemctl not available, skipping PHP-FPM reload"
+#            fi
           
             # ============================================
             # CLEANUP

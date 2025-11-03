@@ -31,7 +31,7 @@ class MenuItemResource extends ModelResource
     protected function modifyQueryBuilder(Builder $builder): Builder
     {
         return $builder
-          ->with(['menu', 'parent', 'menuable']);
+          ->with(['menu', 'parent', 'menuable', 'children']);
     }
 
     /**
@@ -56,7 +56,7 @@ class MenuItemResource extends ModelResource
         return [
           Box::make([
             ID::make(),
-            ID::make('menu_id'),
+//            ID::make('menu_id'),
             BelongsTo::make('Родительский пункт', 'parent', resource: self::class)
                      ->nullable()
                      ->searchable(),
@@ -70,12 +70,12 @@ class MenuItemResource extends ModelResource
             BelongsTo::make('Меню', 'menu', resource: MenuResource::class)
                      ->required()
                      ->searchable(),
-            MorphTo::make('Связанная модель', 'menuable', resource: static::class)
-//                   ->nowOnResource(resource: MenuItemResource::class)
+            MorphTo::make('Связанная модель', 'menuable')
                    ->types([
-                Post::class => ['title', 'Новости'],
-                Page::class => ['title', 'Страницы'],
-              ])->nullable(),
+                     Post::class => ['title', 'Новости'],
+                     Page::class => ['title', 'Страницы'],
+                   ])->nullable()
+                   ->default(null),
           ]),
         ];
     }

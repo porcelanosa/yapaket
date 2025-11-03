@@ -18,9 +18,10 @@ class MenuComposer
     public function compose(View $view): void
     {
         // Отключаем композер для всех /admin маршрутов
-        if (Request::is('admin*') || Request::is('moonshine*')) {
-            return;
-        }
+        // Убрал - проверяется во ViewServiceProvider
+//        if (Request::is('admin*') || Request::is('moonshine*')) {
+//            return;
+//        }
 
         // Загружаем меню с использованием runtime cache
         // При повторных обращениях будет использоваться кеш из памяти

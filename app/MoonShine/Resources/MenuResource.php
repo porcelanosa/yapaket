@@ -32,20 +32,15 @@ class MenuResource extends ModelResource
     protected function modifyQueryBuilder(Builder $builder): Builder
     {
         return $builder
-          ->with(['items']);
+          ->with(['items', 'items.menuable', 'items.children']);
     }
 
     protected function modifyItemQueryBuilder(Builder $builder): Builder
     {
         return $builder
-          ->with([
-//            'categories',
-//            'pages',
-//            'attributes',
-//            /*'primaryImage',
-//            'productImages',*/
-          ]);
+          ->with(['items', 'items.menuable', 'items.children', 'items.menu']);
     }
+
     /**
      * @return list<FieldContract>
      */
@@ -74,13 +69,12 @@ class MenuResource extends ModelResource
             Text::make('Описание блока меню', 'description')->hint('Исключительно для себя, чтобы не забыть где отображается это конкретное меню.'),
 
             HasMany::make('Пункты меню', 'items', resource: MenuItemResource::class)
-                   // Указываем, какие поля отображать в таблице
                    ->fields([
-                       ID::make()->sortable(),
-                       BelongsTo::make('В меню', 'menu', formatted: 'name'),
-                       Text::make('Название', 'title'),
-                       Text::make('URL', 'uurl'),
-                       Number::make('Порядок', 'order'),
+                     ID::make()->sortable(),
+                     BelongsTo::make('В меню', 'menu', formatted: 'name'),
+                     Text::make('Название', 'title'),
+                     Text::make('URL', 'uurl'),
+                     Number::make('Порядок', 'order')->updateOnPreview(),
                    ])
                    ->modifyItemButtons(
                      fn(ActionButton $detail, $edit, $delete, $massDelete, HasMany $ctx) => [$edit, $delete],
@@ -91,12 +85,12 @@ class MenuResource extends ModelResource
                    ->modifyEditButton(
                      fn(ActionButton $button) => $button->setLabel('Изменить'),
                    )
-                   // Добавляем кнопку для прикрепления существующих пунктов меню
+              // Добавляем кнопку для прикрепления существующих пунктов меню
                    ->indexButtons([
-                       ActionButton::make('Прикрепить существующий пункт')
+                ActionButton::make('Прикрепить существующий пункт')
 //                           ->modal('attach-menu-item')
-                           ->icon('heroicons.outline.link')
-                   ])
+                            ->icon('heroicons.outline.link'),
+              ])
                    ->creatable(true),
           ]),
         ];

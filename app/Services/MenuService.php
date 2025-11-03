@@ -18,10 +18,10 @@ class MenuService
         }
 
         // Cache the menu for better performance - используем file cache
-        $result = Cache::store('file')->remember("menu.{$slug}", now()->addHour(), function () use ($slug) {
+        $result = Cache::store('file')->remember("menu.{$slug}", now()->addHours(3), function () use ($slug) {
             $menu = Menu::where('slug', $slug)
-                ->with(['items.menuable']) // Eager load items and their related models
-                ->first();
+                        ->with(['items.menuable', 'items.menu', 'items.children'])
+                        ->first();
 
             if (!$menu) {
                 return collect();
@@ -41,7 +41,7 @@ class MenuService
         $branch = new Collection();
 
         foreach ($items as $item) {
-            if ($item->parent_id == $parentId) {
+            if ($item->parent_id==$parentId) {
                 $children = $this->buildTree($items, $item->id);
                 if ($children->isNotEmpty()) {
                     $item->children = $children;

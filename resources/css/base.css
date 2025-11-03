@@ -25,6 +25,9 @@ h1 {
     margin-top: calc(var(--rhythm-unit) * 3); /* 3 × rhythm */
     margin-bottom: var(--rhythm-unit); /* 1 × rhythm */
 }
+h1.first-title {
+    margin-top: 0;
+}
 
 h2 {
     font-size: var(--text-3xl); /* 1.875rem */
@@ -110,6 +113,7 @@ blockquote {
     padding-left: 1.5em;
     padding-right: 1.5em;
 }
+
 /* Применяем стили сайта к содержимому CKEditor */
 .ck-content {
     p {

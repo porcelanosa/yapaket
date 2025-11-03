@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\HasMenuItems;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -12,6 +13,9 @@ use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
+/**
+ * @method Builder|self active()
+ */
 class Category extends Model implements HasMedia
 {
     use InteractsWithMedia, HasMenuItems;
@@ -82,9 +86,11 @@ class Category extends Model implements HasMedia
         return $this->belongsToMany(Product::class, 'category_product');
     }
 
-    /**
-     * Get the url for the category.
-     */
+    public function scopeActive($query): Builder|self
+    {
+        return $query->where('active', true);
+    }
+
     public function getUrlAttribute(): string
     {
         return route('categories.show', $this->slug);

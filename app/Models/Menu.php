@@ -9,7 +9,17 @@ use Illuminate\Database\Eloquent\Model;
 class Menu extends Model
 {
     protected $fillable = ['name', 'slug', 'title', 'description'];
+//    protected $with = ['items.menuable'];
 
+    public function items()
+    {
+        return $this->hasMany(MenuItem::class, 'menu_id', 'id')->orderBy('order');
+    }
+
+    public function rootItems()
+    {
+        return $this->hasMany(MenuItem::class)->whereNull('parent_id')->orderBy('order');
+    }
     /**
      * Очищаем кеш при изменении меню
      */
@@ -24,13 +34,4 @@ class Menu extends Model
         });
     }
 
-    public function items()
-    {
-        return $this->hasMany(MenuItem::class)->orderBy('order');
-    }
-
-    public function rootItems()
-    {
-        return $this->hasMany(MenuItem::class)->whereNull('parent_id')->orderBy('order');
-    }
 }

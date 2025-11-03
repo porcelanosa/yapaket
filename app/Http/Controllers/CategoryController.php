@@ -13,8 +13,7 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        $categories = Category::whereNull('parent_id')->with(['children', 'products'])
-                              ->where('active', true)
+        $categories = Category::active()->whereNull('parent_id')->with(['children', 'products', 'products.primaryImage'])
                               ->orderBy('sort')
                               ->get();
 
@@ -34,7 +33,7 @@ class CategoryController extends Controller
     public function show(Category $category)
     {
         // load() больше не нужен - связи загружаются через resolveRouteBinding()
-        // $category->load(['children', 'products']);
+        $category->load(['children', 'products', 'products.primaryImage']);
 
         $breadcrumbs = new BreadcrumbHelper()
           ->forCategory($category)

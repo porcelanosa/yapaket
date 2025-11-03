@@ -53,7 +53,7 @@ final class MoonShineLayout extends CompactLayout
           MenuGroup::make(static fn() => 'Настройки меню', [
             MenuItem::make('Меню', MenuResource::class),
             MenuItem::make('Элементы меню', MenuItemResource::class),
-          ]),
+          ])->icon('list-bullet'),
           MenuItem::make('Настройки сайта', SettingsPage::class)
                   ->icon('cog-6-tooth'),
         ];

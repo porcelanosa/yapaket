@@ -13,9 +13,10 @@ class SettingsComposer
     public function compose(View $view): void
     {
         // Проверяем, что это не админка (двойная проверка на случай, если в провайдере не сработало)
-        if (request()->is('admin/*') || request()->is('moonshine/*')) {
-            return;
-        }
+        // Убрал проверяестя во ViewServiceProvider
+//        if (request()->is('admin/*') || request()->is('moonshine/*')) {
+//            return;
+//        }
 
         // Загружаем все настройки один раз
         $settings = SettingsHelper::getAll();
@@ -28,6 +29,12 @@ class SettingsComposer
         $view->with('sitePhone', $settings['general']['phone'] ?? '');
         $view->with('siteAddress', $settings['general']['address'] ?? '');
         $view->with('siteWorkingHours', $settings['general']['working_hours'] ?? '');
+        // ====== КОНТАКТЫ ======
+        $view->with('ordersEmail', $settings['contacts']['orders_email'] ?? '');
+        $view->with('supportEmail', $settings['contacts']['support_email'] ?? '');
+        $view->with('purePhone', $settings['contacts']['pure_phone'] ?? '');
+        $view->with('whatsappPhone', $settings['contacts']['whatsapp'] ?? '');
+        $view->with('telegramUsername', $settings['contacts']['telegram'] ?? '');
         
         // ====== SEO НАСТРОЙКИ ======
         $view->with('seoDefaultTitle', $settings['seo']['default_title'] ?? '');
@@ -36,13 +43,7 @@ class SettingsComposer
         $view->with('googleAnalyticsId', $settings['seo']['google_analytics_id'] ?? '');
         $view->with('yandexMetrikaId', $settings['seo']['yandex_metrika_id'] ?? '');
         $view->with('robotsIndex', $settings['seo']['robots_index'] ?? true);
-        
-        // ====== КОНТАКТЫ ======
-        $view->with('ordersEmail', $settings['contacts']['orders_email'] ?? '');
-        $view->with('supportEmail', $settings['contacts']['support_email'] ?? '');
-        $view->with('salesPhone', $settings['contacts']['sales_phone'] ?? '');
-        $view->with('whatsappPhone', $settings['contacts']['whatsapp'] ?? '');
-        $view->with('telegramUsername', $settings['contacts']['telegram'] ?? '');
+
         
         // ====== СОЦИАЛЬНЫЕ СЕТИ ======
         $view->with('facebookUrl', $settings['social']['facebook_url'] ?? '');

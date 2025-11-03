@@ -1,29 +1,28 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace App\MoonShine\Resources;
 
-use Illuminate\Database\Eloquent\Model;
 use App\Models\Page;
+use App\MoonShine\Fields\CKEditor;
+use App\MoonShine\Fields\MediaLibrary;
 use MoonShine\Contracts\UI\ActionButtonContract;
 use MoonShine\Contracts\UI\FieldContract;
-use MoonShine\Laravel\Fields\Relationships\BelongsToMany;
 use MoonShine\Laravel\Fields\Slug;
 use MoonShine\Laravel\Resources\ModelResource;
 use MoonShine\UI\Fields\ID;
 use MoonShine\UI\Fields\Number;
+use MoonShine\UI\Fields\Select;
 use MoonShine\UI\Fields\Switcher;
 use MoonShine\UI\Fields\Text;
 use MoonShine\UI\Fields\Textarea;
-use App\MoonShine\Fields\MediaLibrary;
-use App\MoonShine\Fields\CKEditor;
 
 class PageResource extends ModelResource
 {
     protected string $model = Page::class;
 
-    protected string $title = 'Страницы';
+    protected string $title  = 'Страницы';
     protected string $column = 'name';
 
     public function title(): string
@@ -43,9 +42,9 @@ class PageResource extends ModelResource
           Text::make('Заголовок', 'title')->sortable(),
           Switcher::make('На главной', 'show_in_main')->updateOnPreview(),
           Switcher::make('Активна', 'active')->updateOnPreview(),
-            Number::make('Порядок', 'sort')
-              ->buttons()
-                  ->min(0)->step(10)->sortable()->updateOnPreview()
+          Number::make('Порядок', 'sort')
+                ->buttons()
+                ->min(0)->step(10)->sortable()->updateOnPreview(),
         ];
     }
 
@@ -63,6 +62,10 @@ class PageResource extends ModelResource
               ->required(),
           Textarea::make('Meta description', 'meta_description'),
           Textarea::make('Анонс', 'short_description'),
+          Select::make('Компонент', 'component')
+                ->options(['contact-form'=> 'Форма контактов' ])
+            ->placeholder('Выберите форму или компонент для включения на страницу')
+                ->nullable(),
 
           CKEditor::make('Содержимое страницы', 'description')
                   ->withFileManager()
@@ -72,7 +75,7 @@ class PageResource extends ModelResource
           Switcher::make('Активна', 'active')->default(true),
           Switcher::make('На главной', 'show_in_main')->default(false),
           MediaLibrary::make('Изображение', 'page_image')
-              ->removable(),
+                      ->removable(),
 //          BelongsToMany::make('Продукты', 'products', resource: ProductResource::class),
         ];
     }
