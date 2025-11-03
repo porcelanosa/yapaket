@@ -64,6 +64,20 @@ class Category extends Model implements HasMedia
           ->format('webp')
           ->optimize()
           ->nonQueued();
+
+
+        $this
+          ->addMediaConversion('original_category_webp')
+          ->format('webp')
+          ->optimize()
+          ->nonQueued()
+          ->performOnCollections('category_image');
+
+        $this
+          ->addMediaConversion('original_category')
+          ->optimize()
+          ->nonQueued()
+          ->performOnCollections('category_image');
     }
 
     public function __toString(): string

@@ -381,6 +381,9 @@ jobs:
             php artisan route:cache
             php artisan view:cache
             echo "✅ Cache optimized"
+               
+            php artisan media-library:regenerate
+            echo "✅ Regenerate Media Library images"
           
             # Оптимизация autoloader
             echo ""
