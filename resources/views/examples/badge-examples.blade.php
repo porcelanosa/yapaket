@@ -42,7 +42,7 @@
             <h2 class="text-xl font-semibold mb-4">С иконками (Umbra UI)</h2>
             <div class="flex flex-wrap gap-3">
                 <x-yp.yp-badge color="red">
-                    <x-umbra-ui::icons.circle-alert />
+                    <x-umbra-ui::icons.circle-arrow-left />
                     Alert
                 </x-yp.yp-badge>
 
@@ -52,12 +52,12 @@
                 </x-yp.yp-badge>
 
                 <x-yp.yp-badge color="blue">
-                    <x-umbra-ui::icons.info />
+                    <x-umbra-ui::icons.info-circle />
                     Info
                 </x-yp.yp-badge>
 
                 <x-yp.yp-badge color="yellow">
-                    <x-umbra-ui::icons.triangle-alert />
+                    <x-umbra-ui::icons.triangle-plus-2 />
                     Warning
                 </x-yp.yp-badge>
 
@@ -73,7 +73,7 @@
             <h2 class="text-xl font-semibold mb-4">С иконками + rounded="lg"</h2>
             <div class="flex flex-wrap gap-3">
                 <x-yp.yp-badge color="red" rounded="lg">
-                    <x-umbra-ui::icons.circle-x />
+                    <x-umbra-ui::icons.circle-arrow-left />
                     Error
                 </x-yp.yp-badge>
 
@@ -83,7 +83,7 @@
                 </x-yp.yp-badge>
 
                 <x-yp.yp-badge color="orange" rounded="lg">
-                    <x-umbra-ui::icons.clock />
+                    <x-umbra-ui::icons.clock-12 />
                     Pending
                 </x-yp.yp-badge>
             </div>
@@ -121,7 +121,7 @@
                 <div class="flex items-center gap-3">
                     <span class="text-gray-700">Статус:</span>
                     <x-yp.yp-badge color="green">
-                        <x-umbra-ui::icons.circle />
+                        <x-umbra-ui::icons.circle-arrow-down-left />
                         Online
                     </x-yp.yp-badge>
                 </div>
