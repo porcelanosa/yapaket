@@ -64,6 +64,16 @@ class Category extends Model implements HasMedia
           ->format('webp')
           ->optimize()
           ->nonQueued();
+        
+        $this
+          ->addMediaConversion('category_small_thumb')
+          ->width(80)
+          ->height(60)
+          ->blur(10)
+//          ->sharpen(10)
+          ->format('webp')
+          ->optimize()
+          ->nonQueued();
 
 
         $this

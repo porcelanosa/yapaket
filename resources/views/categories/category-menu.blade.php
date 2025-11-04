@@ -2,8 +2,8 @@
     @if($menuCategories->isNotEmpty())
         @foreach($menuCategories as $category)
             <div class="mb-6">
-                <h3 class="pb-1 mb-3 mt-1">
-                    <a href="{{ $category['url'] }}" class="text-red-600 hover:text-red-700">
+                <h3 class="pb-1 mb-1 mt-1">
+                    <a href="{{ $category['url'] }}" class="text-lg/tight text-red-600 no-underline hover:text-red-800">
                         {{ $category['name'] }}
                     </a>
                 </h3>

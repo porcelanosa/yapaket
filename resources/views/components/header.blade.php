@@ -4,7 +4,7 @@
 <subheader class="sticky top-0 z-30 bg-white border-0">
     <div class="container mx-auto flex justify-between items-center py-4 px-4">
         <a href="{{ route('home') }}" class="text-2xl font-bold text-red-600">
-            Производство брендированных пакетов.
+            Производство брендированных пакетов
         </a>
 
         <nav class="hidden md:flex space-x-6">
@@ -38,7 +38,7 @@
             <!-- Contact info and mobile menu -->
             <div class="flex items-center justify-between space-x-4">
                 <div class="hidden md:block text-right">
-                    <a class="text-lg text-gray-800 hover:text-gray-700 no-underline font-bold block" href="tel:{{ preg_replace('/[^0-9]/', '', $purePhone) }}">{{ $purePhone }}</a>
+                    <a class="text-lg text-gray-800 hover:text-gray-500 no-underline font-bold block" href="tel:{{ preg_replace('/[^0-9]/', '', $purePhone) }}">{{ $purePhone }}</a>
                     <a class="text-sm text-gray-600 underline hover:no-underline" href="mailto:{{ preg_replace('/[^\w\.\@]/u', '', $siteEmail) }}">
                         {{ $siteEmail }}
                     </a>

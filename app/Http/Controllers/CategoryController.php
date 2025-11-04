@@ -13,7 +13,9 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        $categories = Category::active()->whereNull('parent_id')->with(['children', 'products', 'products.primaryImage'])
+        $categories = Category::active()
+                              ->whereNull('parent_id')
+                              ->with(['children', 'products', 'products.primaryImage'])
                               ->orderBy('sort')
                               ->get();
 
@@ -33,14 +35,14 @@ class CategoryController extends Controller
     public function show(Category $category)
     {
         // load() больше не нужен - связи загружаются через resolveRouteBinding()
-        $category->load(['children', 'products', 'products.primaryImage']);
+        $category->load(['children', 'products', 'products.primaryImage', 'children.products', 'children.products.primaryImage']);
 
         $breadcrumbs = new BreadcrumbHelper()
           ->forCategory($category)
           ->get();
 
-        $image       = $category->getMedia('category_image')[0] ?? '';
-        $thumb_url   = $category->getFirstMediaUrl('category_image', 'category_thumb');
+        $image     = $category->getMedia('category_image')[0] ?? '';
+        $thumb_url = $category->getFirstMediaUrl('category_image', 'category_thumb');
 
         return view('categories.show', [
           'category'    => $category,

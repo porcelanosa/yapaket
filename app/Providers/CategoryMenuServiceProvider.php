@@ -22,7 +22,7 @@ class CategoryMenuServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        ViewFacade::composer('components.category-menu', function (View $view) {
+        ViewFacade::composer('categories.category-menu', function (View $view) {
             $menuCategories = Category::getTwoLevelMenu();
             $view->with('menuCategories', collect($menuCategories));
         });

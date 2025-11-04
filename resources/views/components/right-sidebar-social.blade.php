@@ -1,5 +1,5 @@
 <div>
-    <h3 class="font-bold text-red-600 pb-1 mb-3">
+    <h3 class="text-lg/tight text-red-600 pb-1 mb-3">
         Мы в соцсетях
     </h3>
     <div class="flex space-x-2">

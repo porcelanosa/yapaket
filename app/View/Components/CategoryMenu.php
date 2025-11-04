@@ -21,6 +21,6 @@ class CategoryMenu extends Component
      */
     public function render(): View|Closure|string
     {
-        return view('components.category-menu');
+        return view('categories.category-menu');
     }
 }
